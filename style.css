@@ -91,7 +91,7 @@ html { scroll-padding-top: 76px; }
     linear-gradient(to top, rgba(21, 26, 29, .84) 0%, rgba(21, 26, 29, .5) 40%, rgba(21, 26, 29, .12) 75%),
     linear-gradient(to right, rgba(21, 26, 29, .5), rgba(21, 26, 29, 0) 62%);
 }
-.hero.avec-photo h1 { color: #fff; }
+.hero.avec-photo h1 { color: var(--laiton); }
 .hero.avec-photo .intro { color: #E6EBED; }
 @keyframes fondu { from { opacity: 0; } to { opacity: 1; } }
 h1 {
