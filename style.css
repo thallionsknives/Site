@@ -120,6 +120,11 @@ h1 {
 .fond-contact { background: #EAE2D0; }
 .fond-contact .texte-long { color: var(--encre); }
 
+/* Autoriser les retours à la ligne*/
+#atelier {
+    white-space: pre-line;
+}
+
 /* Blocs */
 .bloc { padding-block: clamp(56px, 9vw, 120px); }
 h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.9rem, 3.6vw, 2.6rem); letter-spacing: -.015em; line-height: 1.1; margin: 0 0 .5em; }
