@@ -1,0 +1,15 @@
+{
+  "nom": "Les couteaux de Thallions",
+  "accroche": "Les couteaux de Thallions",
+  "intro": "Chaque couteau est fabriqué à la main, en petite quantité. Voici ceux qui sont disponibles en ce moment.",
+  "atelier": "Chaque couteau est conçu et fabriqué à la main, en petite quantité. Les matériaux, les finitions et les dimensions sont indiqués sur chaque fiche. Une question, une envie particulière ? Écrivez-moi.",
+  "email": "thallions.knives@gmail.com",
+  "mentions": {
+    "editeur": "",
+    "statut": "",
+    "adresse": "",
+    "siret": "",
+    "telephone": ""
+  },
+  "imageAccueil": "images/hero.jpg"
+}

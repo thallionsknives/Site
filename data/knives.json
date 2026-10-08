@@ -1,0 +1,43 @@
+{
+  "couteaux": [
+    {
+      "id": "exemple-chef",
+      "nom": "Exemple : couteau de chef",
+      "prix": 180,
+      "statut": "disponible",
+      "longueur": "28 cm",
+      "lame": "Acier au carbone, 20 cm",
+      "manche": "Noyer et laiton",
+      "lienAchat": "",
+      "description": "Fiche d'exemple pour voir le rendu du site. Supprimez-la depuis l'espace privé quand vous ajoutez votre premier vrai couteau.",
+      "photos": [],
+      "date": "2026-10-07"
+    },
+    {
+      "id": "exemple-office",
+      "nom": "Exemple : couteau d'office",
+      "prix": 95,
+      "statut": "reserve",
+      "longueur": "19 cm",
+      "lame": "Acier inoxydable, 9 cm",
+      "manche": "Chêne",
+      "lienAchat": "",
+      "description": "Deuxième fiche d'exemple, avec le statut « Réservé ».",
+      "photos": [],
+      "date": "2026-10-07"
+    },
+    {
+      "id": "exemple-vendu",
+      "nom": "Exemple : couteau de poche",
+      "prix": 120,
+      "statut": "vendu",
+      "longueur": "17 cm ouvert",
+      "lame": "Acier inoxydable, 7 cm",
+      "manche": "Corne",
+      "lienAchat": "",
+      "description": "Troisième fiche d'exemple, avec le statut « Vendu ».",
+      "photos": [],
+      "date": "2026-10-07"
+    }
+  ]
+}

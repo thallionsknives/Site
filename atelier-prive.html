@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Espace privé</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.github.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,300..500&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="adm">
+
+<header class="adm-entete">
+  <div class="conteneur adm-ligne">
+    <h1 class="adm-titre">Espace privé</h1>
+    <div class="adm-liens">
+      <a href="index.html">Voir le site</a>
+      <button type="button" id="deco" class="lien-bouton" hidden>Se déconnecter</button>
+    </div>
+  </div>
+</header>
+
+<main class="conteneur adm-main">
+
+  <section id="connexion" aria-labelledby="t-connexion">
+    <h2 id="t-connexion">Connexion</h2>
+    <p class="aide">Cette page modifie le site en écrivant directement dans votre dépôt GitHub. Sans votre jeton d'accès personnel, personne ne peut rien changer, même en connaissant cette adresse. Le jeton reste dans ce navigateur et n'est envoyé qu'à GitHub.</p>
+    <form id="f-connexion" class="formulaire" autocomplete="off">
+      <label>Compte GitHub
+        <input name="owner" required value="thallionsknives" spellcheck="false" autocapitalize="off">
+      </label>
+      <label>Nom du dépôt
+        <input name="repo" required value="site" spellcheck="false" autocapitalize="off">
+      </label>
+      <label>Branche
+        <input name="branch" required value="main" spellcheck="false" autocapitalize="off">
+      </label>
+      <label>Jeton d'accès GitHub
+        <input name="token" type="password" required autocomplete="off" spellcheck="false">
+      </label>
+      <label class="case">
+        <input name="souvenir" type="checkbox"> Rester connecté sur cet appareil
+      </label>
+      <p><button type="submit" class="bouton">Se connecter</button></p>
+    </form>
+    <p id="msg-connexion" class="message" role="status"></p>
+  </section>
+
+  <section id="espace" hidden>
+    <div class="onglets" role="tablist" aria-label="Sections">
+      <button type="button" role="tab" id="o-couteaux" aria-selected="true" aria-controls="p-couteaux">Couteaux</button>
+      <button type="button" role="tab" id="o-textes" aria-selected="false" aria-controls="p-textes">Textes du site</button>
+    </div>
+
+    <div id="p-couteaux" role="tabpanel" aria-labelledby="o-couteaux">
+      <div class="barre">
+        <h2>Couteaux</h2>
+        <button type="button" id="ajouter" class="bouton">Ajouter un couteau</button>
+      </div>
+      <p class="aide">Les changements apparaissent sur le site au bout d'une minute environ.</p>
+      <ul id="liste" class="liste"></ul>
+    </div>
+
+    <div id="p-textes" role="tabpanel" aria-labelledby="o-textes" hidden>
+      <h2>Textes du site</h2>
+      <form id="f-textes" class="formulaire">
+        <label>Titre d'accueil
+          <input name="accroche" maxlength="120">
+        </label>
+        <label>Texte sous la phrase d'accueil
+          <textarea name="intro" rows="3"></textarea>
+        </label>
+        <label>Texte de l'atelier
+          <textarea name="atelier" rows="5"></textarea>
+        </label>
+        <label>E-mail de contact
+          <input name="email" type="email" required>
+        </label>
+        <h3>Mentions légales</h3>
+        <p class="aide">Ces informations sont obligatoires pour un site qui vend. Complétez-les avant de communiquer l'adresse du site.</p>
+        <label>Nom ou raison sociale
+          <input name="m_editeur">
+        </label>
+        <label>Statut (par exemple : micro-entrepreneur)
+          <input name="m_statut">
+        </label>
+        <label>Adresse
+          <input name="m_adresse">
+        </label>
+        <label>Numéro SIRET
+          <input name="m_siret" inputmode="numeric">
+        </label>
+        <label>Téléphone
+          <input name="m_telephone" type="tel">
+        </label>
+        <p><button type="submit" class="bouton">Enregistrer les textes</button></p>
+      </form>
+    </div>
+  </section>
+
+  <p id="statut-global" class="message" role="status" aria-live="polite"></p>
+</main>
+
+<dialog id="editeur" aria-labelledby="editeur-titre">
+  <form id="f-couteau" class="formulaire dialogue">
+    <h2 id="editeur-titre">Ajouter un couteau</h2>
+
+    <label>Nom
+      <input name="nom" required maxlength="80">
+    </label>
+    <div class="deux">
+      <label>Prix en euros
+        <input name="prix" inputmode="decimal" placeholder="180">
+      </label>
+      <label>Statut
+        <select name="statut">
+          <option value="disponible">Disponible</option>
+          <option value="reserve">Réservé</option>
+          <option value="vendu">Vendu</option>
+        </select>
+      </label>
+    </div>
+    <div class="deux">
+      <label>Longueur totale
+        <input name="longueur" placeholder="28 cm" maxlength="60">
+      </label>
+      <label>Manche
+        <input name="manche" placeholder="Noyer et laiton" maxlength="80">
+      </label>
+    </div>
+    <label>Lame
+      <input name="lame" placeholder="Acier au carbone, 20 cm" maxlength="100">
+    </label>
+    <label>Description
+      <textarea name="description" rows="5" maxlength="1500"></textarea>
+    </label>
+    <label>Lien de paiement (facultatif)
+      <input name="lien" type="url" placeholder="https://buy.stripe.com/…">
+      <span class="aide">Quand vous aurez un lien Stripe ou PayPal, collez-le ici : le bouton « Acheter ce couteau » remplacera « Demander ce couteau ».</span>
+    </label>
+
+    <fieldset class="photos">
+      <legend>Photos</legend>
+      <ul id="photos-liste" class="photos-liste"></ul>
+      <label class="fichier">Ajouter des photos
+        <input id="photos-fichiers" type="file" accept="image/*" multiple>
+      </label>
+      <p class="aide">La première photo est celle de la collection. Les photos sont réduites automatiquement pour que le site reste rapide.</p>
+    </fieldset>
+
+    <p id="msg-editeur" class="message" role="status" aria-live="polite"></p>
+    <div class="actions">
+      <button type="submit" class="bouton" id="enregistrer">Enregistrer</button>
+      <button type="button" class="bouton secondaire" id="annuler">Annuler</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="admin.js"></script>
+</body>
+</html>

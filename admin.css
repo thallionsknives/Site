@@ -1,0 +1,69 @@
+/* Espace privé : styles complémentaires à style.css */
+
+.adm-entete { border-bottom: 1px solid var(--lame); background: var(--blanc); }
+.adm-ligne { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 16px; }
+.adm-titre { font-family: var(--serif); font-weight: 400; font-size: 1.5rem; letter-spacing: -.01em; margin: 0; max-width: none; }
+.adm-liens { display: flex; gap: 20px; align-items: center; font-size: .95rem; }
+.lien-bouton { font: inherit; color: inherit; background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
+
+.adm-main { padding-block: clamp(28px, 5vw, 56px); max-width: 760px; }
+.adm h2 { font-size: 1.7rem; }
+.adm h3 { font: 600 1rem var(--sans); margin: 2em 0 .3em; }
+.aide { color: var(--gris); font-size: .93rem; margin: 0 0 1.2em; max-width: 62ch; }
+.formulaire .aide { margin: .4em 0 0; }
+
+.formulaire { display: grid; gap: 16px; }
+.formulaire label { display: grid; gap: 6px; font-weight: 500; font-size: .95rem; }
+.formulaire input:not([type="checkbox"]):not([type="file"]), .formulaire textarea, .formulaire select {
+  font: 400 1rem var(--sans); color: var(--encre); background: var(--blanc);
+  border: 1px solid var(--lame); border-radius: 2px; padding: .65em .8em; width: 100%;
+}
+.formulaire textarea { resize: vertical; line-height: 1.5; }
+.formulaire .case { display: flex; align-items: center; gap: 10px; font-weight: 400; }
+.deux { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+button.bouton { font: 500 1rem var(--sans); cursor: pointer; }
+button.bouton:disabled { opacity: .55; cursor: wait; }
+.bouton.secondaire { background: transparent; color: var(--encre); border-color: var(--lame); }
+.bouton.secondaire:hover { background: transparent; border-color: var(--gris); }
+.bouton.danger { background: transparent; color: #8A2A22; border-color: #D9B5B1; }
+.bouton.petit { padding: .4em .9em; font-size: .9rem; }
+
+.message { min-height: 1.5em; margin: .8em 0 0; color: var(--gris); }
+.message.erreur { color: #8A2A22; font-weight: 500; }
+
+.onglets { display: flex; gap: 4px; border-bottom: 1px solid var(--lame); margin-bottom: 28px; }
+.onglets button {
+  font: 500 1rem var(--sans); color: var(--gris); background: none; border: 0;
+  border-bottom: 2px solid transparent; padding: .7em 1em; cursor: pointer; margin-bottom: -1px;
+}
+.onglets button[aria-selected="true"] { color: var(--encre); border-bottom-color: var(--laiton); }
+
+.barre { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: .6em; }
+.barre h2 { margin: 0; }
+
+.liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.liste li { display: grid; grid-template-columns: 72px 1fr; gap: 16px; align-items: center; background: var(--blanc); border: 1px solid var(--lame); border-radius: 2px; padding: 12px; }
+.liste .mini-photo { width: 72px; height: 90px; object-fit: cover; background: var(--papier); border: 1px solid var(--lame); }
+.liste .sans { display: grid; place-items: center; color: var(--lame); font-size: .8rem; }
+.liste .nom-ligne { font-family: var(--serif); font-size: 1.2rem; }
+.liste .meta { color: var(--gris); font-size: .9rem; margin: 2px 0 10px; }
+.liste .boutons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+dialog .dialogue { padding: clamp(20px, 4vw, 40px); }
+dialog .dialogue h2 { margin-bottom: .6em; }
+dialog { width: min(680px, calc(100% - 24px)); }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.photos { border: 1px solid var(--lame); border-radius: 2px; padding: 14px 16px 16px; margin: 0; }
+.photos legend { font-weight: 500; font-size: .95rem; padding-inline: 6px; }
+.photos-liste { list-style: none; padding: 0; margin: 0 0 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+.photos-liste li { display: grid; gap: 6px; }
+.photos-liste img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border: 1px solid var(--lame); background: var(--papier); }
+.photos-liste .rangee { display: flex; gap: 6px; flex-wrap: wrap; }
+.photos-liste button { font: 500 .8rem var(--sans); padding: .3em .6em; border: 1px solid var(--lame); background: var(--blanc); border-radius: 2px; cursor: pointer; }
+.fichier input { font-weight: 400; }
+
+@media (max-width: 560px) {
+  .deux { grid-template-columns: 1fr; }
+}

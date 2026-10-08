@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Les couteaux de Thallions</title>
+  <meta name="description" content="Couteaux faits main, en petite quantité. Découvrez la collection et écrivez à l'atelier pour en acquérir un.">
+  <meta name="theme-color" content="#F6F7F7">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<a class="evitement" href="#collection">Aller à la collection</a>
+
+<header class="entete" id="entete">
+  <div class="conteneur entete-ligne">
+    <a class="marque" href="#haut" aria-label="Les couteaux de Thallions, retour en haut">
+      <img src="images/logo.png" alt="Logo Thallions" width="352" height="360">
+    </a>
+    <nav aria-label="Navigation principale">
+      <ul class="menu">
+        <li><a href="#collection">Collection</a></li>
+        <li><a href="#atelier">L'atelier</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li>
+          <a class="menu-insta" href="https://www.instagram.com/thallions.knives/" target="_blank" rel="noopener noreferrer" aria-label="Instagram thallions.knives (nouvel onglet)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg>
+            <span class="insta-texte">Instagram</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div class="progres" aria-hidden="true"></div>
+</header>
+
+<main>
+  <section class="hero" id="haut" aria-labelledby="accroche">
+    <figure class="hero-fond" id="hero-photo" hidden>
+      <img id="hero-img" alt="Finition artisanale d'un couteau en bois" decoding="async">
+    </figure>
+    <div class="hero-voile" aria-hidden="true"></div>
+
+    <div class="hero-contenu conteneur">
+      <h1 id="accroche">Les couteaux de Thallions</h1>
+      <p class="intro reveal" id="intro">Chaque couteau est fabriqué à la main, en petite quantité. Voici ceux qui sont disponibles en ce moment.</p>
+
+      <svg class="lame" viewBox="0 0 1200 150" role="img" aria-label="Silhouette d'un couteau">
+        <path class="trace" pathLength="1" d="M430 44 H1010 C1090 46 1150 80 1172 104 H430 Z"/>
+        <rect class="trace" pathLength="1" x="40" y="42" width="380" height="64" rx="32"/>
+        <line class="laiton" x1="425" y1="40" x2="425" y2="108"/>
+        <circle class="laiton" cx="130" cy="74" r="7"/>
+        <circle class="laiton" cx="260" cy="74" r="7"/>
+        <circle class="laiton" cx="360" cy="74" r="7"/>
+      </svg>
+    </div>
+  </section>
+
+  <section id="collection" class="bloc fond-collection" aria-labelledby="titre-collection">
+    <div class="conteneur">
+      <div class="bloc-tete reveal">
+        <div>
+          <h2 id="titre-collection">La collection</h2>
+          <p class="compte" id="compte"></p>
+        </div>
+        <div class="filtres" role="group" aria-label="Filtrer la collection">
+          <button type="button" class="filtre" data-filtre="tous" aria-pressed="true">Tous</button>
+          <button type="button" class="filtre" data-filtre="disponible" aria-pressed="false">Disponibles</button>
+        </div>
+      </div>
+      <div id="grille" class="grille" aria-live="polite"></div>
+      <p id="vide" class="vide" hidden>Aucun couteau disponible pour le moment. Écrivez-moi pour être prévenu du prochain.</p>
+    </div>
+  </section>
+
+  <section id="atelier" class="bloc fond-atelier" aria-labelledby="titre-atelier">
+    <div class="conteneur">
+      <h2 class="reveal" id="titre-atelier">L'atelier</h2>
+      <p class="texte-long reveal" id="atelier-texte">Chaque couteau est conçu et fabriqué à la main, en petite quantité. Les matériaux, les finitions et les dimensions sont indiqués sur chaque fiche.</p>
+    </div>
+  </section>
+
+  <section id="contact" class="bloc fond-contact" aria-labelledby="titre-contact">
+    <div class="conteneur">
+      <h2 class="reveal" id="titre-contact">Acquérir un couteau</h2>
+      <p class="texte-long reveal">Le paiement en ligne n'est pas encore ouvert. Pour acheter, écrivez-moi en indiquant le couteau qui vous intéresse : je vous réponds avec les modalités de paiement et d'envoi.</p>
+      <p class="reveal"><a class="bouton" id="contact-lien" href="#contact">Écrire à l'atelier</a></p>
+    </div>
+  </section>
+</main>
+
+<footer class="pied">
+  <div class="conteneur pied-ligne">
+    <p class="signature"><button type="button" id="signature" class="signature-bouton" aria-label="Copyright">©</button> <span id="annee">2026</span> Les couteaux de Thallions</p>
+    <button type="button" class="pied-lien" id="ouvrir-mentions" aria-haspopup="dialog">Mentions légales</button>
+  </div>
+</footer>
+
+<dialog id="mentions" class="dialogue-texte" aria-labelledby="titre-mentions">
+  <button type="button" class="fermer" id="mentions-fermer" aria-label="Fermer les mentions légales">Fermer</button>
+  <div class="mentions">
+    <h2 id="titre-mentions">Mentions légales</h2>
+
+    <h3>Éditeur du site</h3>
+    <p id="m-editeur">À compléter : nom ou raison sociale, statut, adresse, numéro SIRET, e-mail et téléphone de l'éditeur.</p>
+
+    <h3>Directeur de la publication</h3>
+    <p id="m-directeur">À compléter.</p>
+
+    <h3>Hébergement</h3>
+    <p>GitHub, Inc. (service GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
+
+    <h3>Propriété intellectuelle</h3>
+    <p>Les photographies, textes et créations présentés sur ce site appartiennent à leur auteur. Toute reproduction ou réutilisation sans autorisation écrite est interdite.</p>
+
+    <h3>Données personnelles</h3>
+    <p>Ce site ne dépose aucun cookie et ne collecte aucune donnée. Les messages envoyés par e-mail ne servent qu'à répondre à votre demande. Vous pouvez demander l'accès, la rectification ou la suppression de vos données en écrivant à l'adresse de l'éditeur. Les polices de caractères sont chargées depuis Google Fonts, ce qui transmet l'adresse IP du visiteur à Google.</p>
+
+    <h3>Ventes</h3>
+    <p>Les ventes se concluent par échange direct avec l'éditeur. Les conditions de paiement et de livraison sont précisées avant toute commande.</p>
+  </div>
+</dialog>
+
+<dialog id="fiche" aria-labelledby="fiche-titre">
+  <button type="button" class="fermer" id="fiche-fermer" aria-label="Fermer la fiche">Fermer</button>
+  <div id="fiche-corps" class="fiche-corps"></div>
+</dialog>
+
+<script src="script.js"></script>
+</body>
+</html>
