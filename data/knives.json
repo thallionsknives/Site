@@ -3,7 +3,7 @@
     {
       "id": "sommelier-mv19vjdn",
       "nom": "Sommelier",
-      "prix": 150,
+      "prix": null,
       "statut": "reserve",
       "longueur": "12.5 cm",
       "lame": "Acier inoxydable",
