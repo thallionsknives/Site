@@ -8,6 +8,7 @@
   --encre: #151A1D;
   --lame: #CDD3D6;
   --gris: #58646A;
+   --red: #D94A3C;
   --laiton: #bb7e00;
   --laiton-texte: #7A5F25;
   --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
@@ -70,8 +71,8 @@ body { padding-top: var(--h-entete); }
 .en-construction { flex: 1; display: flex; justify-content: center; margin: 0; }
 .en-construction span {
   display: inline-flex; align-items: center; gap: 9px; white-space: nowrap;
-  padding: .32em 1em; border: 1px solid var(--lame); border-radius: 999px;
-  color: var(--gris); font-size: .84rem; font-weight: 500;
+  padding: .32em 1em; border: 1px solid var(--red); border-radius: 999px;
+  color: var(--red); font-size: .84rem; font-weight: 500;
 }
 .en-construction span::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--laiton); }
 
