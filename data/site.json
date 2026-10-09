@@ -13,5 +13,8 @@
   },
   "imageAccueil": "images/hero.jpg",
   "compteur": "thallions",
-  "atelierPhotos": []
+  "atelierPhotos": [
+    "images/atelier/atelier-mv108p8w0.jpg",
+    "images/atelier/atelier-mv108qhx1.jpg"
+  ]
 }
