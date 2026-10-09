@@ -1,6 +1,21 @@
 {
   "couteaux": [
     {
+      "id": "kiridashi-mv19elug",
+      "nom": "Kiridashi",
+      "prix": 70,
+      "statut": "reserve",
+      "longueur": "9 cm",
+      "lame": "Acier inoxydable, 3.5 cm",
+      "manche": "pêcher",
+      "lienAchat": "",
+      "description": "Kiridashi \n- Manche en pêcher stabilisé\n- Lame acier inoxydable X50CrMoV15",
+      "photos": [
+        "images/couteaux/kiridashi-mv19elug-mv19elwg0.jpg"
+      ],
+      "date": "2026-10-09"
+    },
+    {
       "id": "laurent-mv191pmy",
       "nom": "Laurent",
       "prix": 70,
