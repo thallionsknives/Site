@@ -80,7 +80,7 @@
     {
       "id": "exemple-vendu",
       "nom": "Sobre",
-      "prix": 100,
+      "prix": null,
       "statut": "disponible",
       "longueur": "20 cm ouvert",
       "lame": "Acier au carbone, 7 cm",
