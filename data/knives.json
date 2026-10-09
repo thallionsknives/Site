@@ -1,6 +1,21 @@
 {
   "couteaux": [
     {
+      "id": "sommelier-mv19vjdn",
+      "nom": "Sommelier",
+      "prix": 150,
+      "statut": "disponible",
+      "longueur": "12.5 cm",
+      "lame": "Acier inoxydable",
+      "manche": "pêcher",
+      "lienAchat": "",
+      "description": "",
+      "photos": [
+        "images/couteaux/sommelier-mv19vjdn-mv19vjeb0.jpg"
+      ],
+      "date": "2026-10-09"
+    },
+    {
       "id": "kiridashi-mv19elug",
       "nom": "Kiridashi",
       "prix": 70,
