@@ -18,15 +18,17 @@
     },
     {
       "id": "exemple-office",
-      "nom": "Exemple : couteau d'office",
-      "prix": 95,
+      "nom": "Agnès",
+      "prix": 100,
       "statut": "reserve",
-      "longueur": "19 cm",
-      "lame": "Acier inoxydable, 9 cm",
-      "manche": "Chêne",
+      "longueur": "16 cm",
+      "lame": "Acier Carbonne, 6 cm",
+      "manche": "Frêne",
       "lienAchat": "",
-      "description": "Deuxième fiche d'exemple, avec le statut « Réservé ».",
-      "photos": [],
+      "description": "Couteau de service\n-Manche en frêne stabilisé naturel et rose\n-Lame XC75",
+      "photos": [
+        "images/couteaux/exemple-office-mv18pgt40.jpg"
+      ],
       "date": "2026-10-07"
     },
     {
