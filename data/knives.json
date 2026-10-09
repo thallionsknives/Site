@@ -49,7 +49,7 @@
     {
       "id": "exemple-chef",
       "nom": "Sarah",
-      "prix": 120,
+      "prix": null,
       "statut": "reserve",
       "longueur": "15.2 cm",
       "lame": "Acier inoxydable, 6.5 cm",
