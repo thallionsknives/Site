@@ -33,7 +33,7 @@
     {
       "id": "laurent-mv191pmy",
       "nom": "Laurent",
-      "prix": 70,
+      "prix": null,
       "statut": "reserve",
       "longueur": "12.5 cm",
       "lame": "Acier inoxydable, 5 cm",
