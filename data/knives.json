@@ -2,15 +2,18 @@
   "couteaux": [
     {
       "id": "exemple-chef",
-      "nom": "Exemple : couteau de chef",
-      "prix": 180,
+      "nom": "Sarah",
+      "prix": 120,
       "statut": "disponible",
-      "longueur": "28 cm",
-      "lame": "Acier au carbone, 20 cm",
-      "manche": "Noyer et laiton",
+      "longueur": "15.2 cm",
+      "lame": "Acier inoxydable, 6.5 cm",
+      "manche": "Frêne",
       "lienAchat": "",
-      "description": "Fiche d'exemple pour voir le rendu du site. Supprimez-la depuis l'espace privé quand vous ajoutez votre premier vrai couteau.",
-      "photos": [],
+      "description": "Couteau pliant \nManche en frêne stabilisé rose\nLame X50CrMoV15",
+      "photos": [
+        "images/couteaux/exemple-chef-mv18igtb0.jpg",
+        "images/couteaux/exemple-chef-mv18iisg1.jpg"
+      ],
       "date": "2026-10-07"
     },
     {
