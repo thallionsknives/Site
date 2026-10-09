@@ -33,15 +33,17 @@
     },
     {
       "id": "exemple-vendu",
-      "nom": "Exemple : couteau pliant",
-      "prix": 120,
-      "statut": "vendu",
-      "longueur": "17 cm ouvert",
-      "lame": "Acier inoxydable, 7 cm",
-      "manche": "Corne",
+      "nom": "Sobre",
+      "prix": 100,
+      "statut": "disponible",
+      "longueur": "20 cm ouvert",
+      "lame": "Acier au carbone, 7 cm",
+      "manche": "Frêne",
       "lienAchat": "",
-      "description": "Troisième fiche d'exemple, avec le statut « Vendu ».",
-      "photos": [],
+      "description": "Couteau fixe\n-manche en frêne stabilisé gris\n-lame XC75 avec guillochage",
+      "photos": [
+        "images/couteaux/exemple-vendu-mv18upbl0.jpg"
+      ],
       "date": "2026-10-07"
     }
   ]
