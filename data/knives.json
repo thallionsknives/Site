@@ -1,6 +1,22 @@
 {
   "couteaux": [
     {
+      "id": "laurent-mv191pmy",
+      "nom": "Laurent",
+      "prix": 70,
+      "statut": "vendu",
+      "longueur": "12.5 cm",
+      "lame": "Acier inoxydable, 5 cm",
+      "manche": "pêcher",
+      "lienAchat": "",
+      "description": "Couteau à huitre\n- Manche ergonomique en pêcher\n- lame inoxydable: X50CrMoV15 avec guillochage\n- Rivet mosaïque",
+      "photos": [
+        "images/couteaux/laurent-mv191pmy-mv191pp10.jpg",
+        "images/couteaux/laurent-mv191pmy-mv191r3d1.jpg"
+      ],
+      "date": "2026-10-09"
+    },
+    {
       "id": "exemple-chef",
       "nom": "Sarah",
       "prix": 120,
