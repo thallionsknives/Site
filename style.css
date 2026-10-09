@@ -158,11 +158,11 @@ h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.9rem, 3.6vw
 .filtre[aria-pressed="true"] { background: var(--acier); border-color: var(--acier); color: #fff; }
 
 /* Grille de couteaux */
-.grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); gap: clamp(28px, 4vw, 52px) clamp(20px, 3vw, 36px); }
+.grille { align-items: start; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); gap: clamp(28px, 4vw, 52px) clamp(20px, 3vw, 36px); }
 
 .carte { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
-.vignette { margin: 0; aspect-ratio: 4 / 5; background: var(--blanc); border: 1px solid var(--lame); border-radius: 2px; overflow: hidden; }
-.vignette img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.vignette { margin: 0; background: var(--blanc); border: 1px solid var(--lame); border-radius: 2px; overflow: hidden; }
+.vignette img { display: block; width: 100%; height: auto; transition: transform .5s ease; }
 .carte:hover .vignette img { transform: scale(1.025); }
 .carte-vendu .vignette img, .carte-vendu .sans-photo { filter: grayscale(1); opacity: .55; }
 
@@ -176,6 +176,7 @@ h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.9rem, 3.6vw
 .statut-vendu::before { background: var(--lame); }
 .statut-reserve::before { background: transparent; border: 1.5px solid var(--laiton); }
 
+.vignette .sans-photo { aspect-ratio: 4 / 5; }
 .sans-photo { width: 100%; height: 100%; display: grid; place-items: center; background: var(--blanc); }
 .sans-photo svg { width: 100%; height: 100%; }
 
@@ -196,7 +197,7 @@ dialog::backdrop { background: rgba(21, 26, 29, .6); }
 
 .fiche-corps { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
 .galerie { background: var(--papier); padding: clamp(14px, 2vw, 24px); }
-.galerie .grande { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border: 1px solid var(--lame); background: var(--blanc); }
+.galerie .grande { display: block; width: auto; height: auto; max-width: 100%; max-height: min(78dvh, 720px); margin-inline: auto; border: 1px solid var(--lame); background: var(--blanc); }
 .galerie .sans-photo { aspect-ratio: 4 / 5; border: 1px solid var(--lame); }
 .minis { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .mini { width: 64px; height: 64px; padding: 0; border: 1px solid var(--lame); background: var(--blanc); cursor: pointer; }
@@ -238,7 +239,7 @@ dialog::backdrop { background: rgba(21, 26, 29, .6); }
 
 /* Photo secondaire d'un couteau : elle apparaît au survol de la vignette */
 .vignette { position: relative; }
-.vignette .seconde { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease; }
+.vignette .seconde { position: absolute; inset: 0; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s ease; }
 .carte:hover .vignette .seconde { opacity: 1; }
 
 /* Pied de page et fenêtre des mentions légales */
