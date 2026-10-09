@@ -20,7 +20,7 @@
       "id": "exemple-chef",
       "nom": "Sarah",
       "prix": 120,
-      "statut": "disponible",
+      "statut": "reserve",
       "longueur": "15.2 cm",
       "lame": "Acier inoxydable, 6.5 cm",
       "manche": "Frêne",
