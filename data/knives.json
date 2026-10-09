@@ -65,7 +65,7 @@
     {
       "id": "exemple-office",
       "nom": "Agnès",
-      "prix": 100,
+      "prix": null,
       "statut": "reserve",
       "longueur": "16 cm",
       "lame": "Acier Carbone, 6 cm",
