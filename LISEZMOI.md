@@ -64,3 +64,22 @@ Avant de vendre : complétez les mentions légales (onglet « Textes du site »)
 
 La photo à côté du titre est lue dans `images/hero.jpg` (elle est déjà incluse). Pour la changer, remplacez ce fichier par une autre photo de même nom (de préférence en paysage, rapport 3:2), via Add file > Upload files dans le dossier `images` de GitHub.
 Si votre nouveau fichier porte un autre nom ou un autre format (par exemple `images/finition.png`), écrivez ce chemin dans `data/site.json`, à la ligne `"imageAccueil"`.
+
+## 7. Photos : couteaux et atelier
+
+- Chaque couteau accepte de 1 à 3 photos (page privée > Couteaux > Ajouter ou Modifier). La première s'affiche dans la collection, la deuxième apparaît quand on passe la souris dessus, et les trois sont visibles dans la fiche.
+- L'onglet « Photos de l'atelier » de la page privée permet d'ajouter autant de photos que vous voulez. Elles s'affichent sous le texte de la partie « L'atelier », et un clic les agrandit. Vous pouvez les réordonner (Avancer / Reculer) ou les retirer.
+
+## 8. Compteur de visites (GoatCounter)
+
+Le compteur affiche, dans la page privée, le nombre de visites du site et le nombre d'ouvertures de la fiche de chaque couteau. Il utilise GoatCounter, un service gratuit sans cookie.
+
+1. Créez un compte sur goatcounter.com (« Sign up »). Choisissez un code (par exemple `thallions` : votre compteur sera `thallions.goatcounter.com`).
+2. Dans GoatCounter, ouvrez **Settings** et cochez **Allow adding visitor counts on your website**, puis enregistrez.
+3. Dans votre page privée > **Textes du site** > **Code GoatCounter**, saisissez le code (sans « .goatcounter.com ») et enregistrez.
+
+Vos propres visites ne sont pas comptées sur les appareils où vous vous êtes connecté à la page privée. Les visiteurs qui bloquent les traceurs ne sont pas comptés non plus : les chiffres sont donc des minimums.
+
+## 9. Retirer « Site en construction »
+
+Dans `index.html`, supprimez la ligne `<p class="en-construction"><span>Site en construction</span></p>` (vous pouvez le faire directement sur GitHub : ouvrez `index.html`, cliquez sur le crayon, supprimez la ligne, puis « Commit changes »).

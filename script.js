@@ -14,6 +14,23 @@
   let couteaux = [];
   let filtre = 'tous';
 
+  /* ---------- Compteur de visites : GoatCounter, sans cookie ----------
+     Le code du compteur est dans data/site.json (clé « compteur »). Sans code, rien n'est compté.
+     Une visite est comptée une seule fois par session, et jamais depuis l'appareil du propriétaire
+     (il est reconnu quand il s'est connecté à l'espace privé). */
+  function compter(chemin, titre) {
+    const code = site.compteur;
+    if (typeof code !== 'string' || !/^[a-z0-9-]{2,40}$/.test(code)) return;
+    try {
+      if (localStorage.getItem('thallions-proprio')) return;
+      const cle = 'gc:' + chemin;
+      if (sessionStorage.getItem(cle)) return;
+      sessionStorage.setItem(cle, '1');
+    } catch (e) { /* stockage indisponible : on compte quand même */ }
+    const u = `https://${code}.goatcounter.com/count?p=${encodeURIComponent(chemin)}&t=${encodeURIComponent(titre || chemin)}&rnd=${Math.random().toString(36).slice(2)}`;
+    new Image().src = u;
+  }
+
   /* ---------- Effets au défilement (sobres, coupés si « mouvement réduit ») ---------- */
   document.documentElement.classList.add('js');
 
@@ -39,7 +56,7 @@
     const maj = () => {
       attente = false;
       const y = window.scrollY || 0;
-      entete.classList.toggle('defile', y > 24);
+      if (y > 48) entete.classList.add('defile'); else if (y < 16) entete.classList.remove('defile');
       const total = document.documentElement.scrollHeight - window.innerHeight;
       barre.style.transform = `scaleX(${total > 0 ? Math.min(1, y / total) : 0})`;
     };
@@ -98,6 +115,9 @@
     const vignette = el('figure', { class: 'vignette' });
     if (photos.length) {
       vignette.append(el('img', { src: photos[0], alt: '', loading: 'lazy', decoding: 'async' }));
+      if (photos.length > 1 && st !== 'vendu') {
+        vignette.append(el('img', { class: 'seconde', src: photos[1], alt: '', loading: 'lazy', decoding: 'async' }));
+      }
     } else {
       vignette.append(sansPhoto());
     }
@@ -189,6 +209,48 @@
     corps.append(galerie, infos);
     dlg._retour = declencheur;
     dlg.showModal();
+    if (c.id) compter('/couteau/' + c.id, c.nom || c.id);
+  }
+
+  /* Galerie de l'atelier : liste « atelierPhotos » de data/site.json (autant de photos que l'on veut) */
+  let photosAtelier = [];
+  let indexZoom = 0;
+
+  function afficherAtelier() {
+    const zone = $('#atelier-galerie');
+    photosAtelier = (Array.isArray(site.atelierPhotos) ? site.atelierPhotos : []).filter((p) => typeof p === 'string' && CHEMIN_OK.test(p));
+    zone.replaceChildren();
+    zone.hidden = photosAtelier.length === 0;
+    photosAtelier.forEach((p, i) => {
+      const b = el('button', { type: 'button', class: 'atelier-photo reveal', 'aria-label': `Agrandir la photo ${i + 1} de l'atelier` },
+        el('img', { src: p, alt: `Photo ${i + 1} de l'atelier`, loading: 'lazy', decoding: 'async' }));
+      b.addEventListener('click', () => ouvrirZoom(i, b));
+      zone.append(b);
+      surveiller(b);
+    });
+  }
+
+  function montrerZoom() {
+    const img = $('#zoom-img');
+    img.src = photosAtelier[indexZoom];
+    img.alt = `Photo ${indexZoom + 1} sur ${photosAtelier.length} de l'atelier`;
+    const seule = photosAtelier.length < 2;
+    $('#zoom-prec').hidden = seule;
+    $('#zoom-suiv').hidden = seule;
+  }
+
+  function ouvrirZoom(i, declencheur) {
+    const dlg = $('#zoom');
+    indexZoom = i;
+    dlg._retour = declencheur;
+    montrerZoom();
+    dlg.showModal();
+  }
+
+  function pasZoom(sens) {
+    if (photosAtelier.length < 2) return;
+    indexZoom = (indexZoom + sens + photosAtelier.length) % photosAtelier.length;
+    montrerZoom();
   }
 
   /* Photo d'accueil : chemin réglable dans data/site.json (clé « imageAccueil »).
@@ -258,6 +320,18 @@
     mentions.addEventListener('click', (e) => { if (e.target === mentions) mentions.close(); });
     mentions.addEventListener('close', () => ouvrirMentions.focus());
 
+    // Visionneuse de photos
+    const zoom = $('#zoom');
+    $('#zoom-fermer').addEventListener('click', () => zoom.close());
+    $('#zoom-prec').addEventListener('click', () => pasZoom(-1));
+    $('#zoom-suiv').addEventListener('click', () => pasZoom(1));
+    zoom.addEventListener('click', (e) => { if (e.target === zoom) zoom.close(); });
+    zoom.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') pasZoom(-1);
+      if (e.key === 'ArrowRight') pasZoom(1);
+    });
+    zoom.addEventListener('close', () => { if (zoom._retour) zoom._retour.focus(); });
+
     const dlg = $('#fiche');
     $('#fiche-fermer').addEventListener('click', () => dlg.close());
     dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
@@ -278,6 +352,8 @@
     } catch (e) { site = {}; }
     appliquerSite();
     afficherPhotoAccueil();
+    afficherAtelier();
+    compter('/visite', 'Visite du site');
 
     try {
       const data = await charger('data/knives.json');

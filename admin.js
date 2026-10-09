@@ -7,7 +7,7 @@
   const FICHIER_COUTEAUX = 'data/knives.json';
   const FICHIER_SITE = 'data/site.json';
   const CLE_STOCKAGE = 'thallions-connexion';
-  const MAX_PHOTOS = 10;
+  const MAX_PHOTOS = 3;
   const LIEN_OK = /^https:\/\/[^\s"'<>]+$/;
   const LIBELLES = { disponible: 'Disponible', reserve: 'Réservé', vendu: 'Vendu' };
 
@@ -18,6 +18,7 @@
   let existantes = [];
   let aRetirer = [];
   let nouvelles = [];
+  let comptes = {};
 
   /* ---------- Utilitaires ---------- */
 
@@ -143,6 +144,135 @@
     return canvas.toDataURL('image/jpeg', 0.86).split(',')[1];
   }
 
+  /* ---------- Compteurs de visites (GoatCounter) ---------- */
+
+  function codeCompteur() {
+    const c = site && site.compteur;
+    return typeof c === 'string' && /^[a-z0-9-]{2,40}$/.test(c) ? c : '';
+  }
+
+  /* Renvoie le nombre affiché par GoatCounter, '0' si rien n'est encore compté, ou null si illisible. */
+  async function lireCompteur(chemin) {
+    const code = codeCompteur();
+    if (!code) return null;
+    try {
+      const r = await fetch(`https://${code}.goatcounter.com/counter/${encodeURIComponent(chemin)}.json`, { cache: 'no-store' });
+      if (r.status === 404) return '0';
+      if (!r.ok) return null;
+      const d = await r.json();
+      return String(d.count).replace(/\s/g, '\u202f');
+    } catch (e) { return null; }
+  }
+
+  function texteVues(id) {
+    if (!codeCompteur()) return '';
+    const v = comptes[id];
+    if (v === undefined) return '…';
+    return v === null ? 'n/d' : `${v} ${v === '1' ? 'vue' : 'vues'}`;
+  }
+
+  async function majCompteurs() {
+    const total = $('#stat-total');
+    const note = $('#stat-note');
+    if (!codeCompteur()) {
+      total.textContent = '–';
+      note.textContent = 'Compteur non activé. Créez un compte gratuit sur goatcounter.com, puis indiquez son code dans « Textes du site ».';
+      return;
+    }
+    note.textContent = '';
+    const [t, ...autres] = await Promise.all([
+      lireCompteur('/visite'),
+      ...couteaux.map((c) => lireCompteur('/couteau/' + c.id)),
+    ]);
+    total.textContent = t === null ? 'n/d' : t;
+    couteaux.forEach((c, i) => { comptes[c.id] = autres[i]; });
+    document.querySelectorAll('.vues').forEach((n) => { n.textContent = texteVues(n.dataset.id); });
+    if (t === null) {
+      note.textContent = 'Compteur illisible. Vérifiez le code, et dans GoatCounter (Settings) l\'option « Allow adding visitor counts on your website ».';
+    } else {
+      note.textContent = 'Visites depuis le début. Vos propres visites, faites depuis un appareil où vous vous êtes connecté ici, ne sont pas comptées. Les visiteurs qui bloquent les traceurs ne le sont pas non plus : ce sont donc des chiffres minimaux.';
+    }
+  }
+
+  /* ---------- Photos de l'atelier ---------- */
+
+  function listeAtelier() {
+    return Array.isArray(site.atelierPhotos) ? site.atelierPhotos : [];
+  }
+
+  function afficherAtelier() {
+    const ul = $('#atelier-liste');
+    ul.replaceChildren();
+    const photos = listeAtelier();
+    if (!photos.length) {
+      ul.append(el('li', { class: 'vide-liste', text: 'Aucune photo pour le moment.' }));
+      return;
+    }
+    photos.forEach((p, i) => {
+      const img = el('img', { src: p, alt: `Photo ${i + 1} de l'atelier` });
+      img.addEventListener('error', () => { img.alt = 'En cours de publication…'; });
+      const rangee = el('div', { class: 'rangee' });
+      if (i > 0) {
+        const av = el('button', { type: 'button', text: 'Avancer' });
+        av.addEventListener('click', () => deplacerAtelier(i, -1));
+        rangee.append(av);
+      }
+      if (i < photos.length - 1) {
+        const re = el('button', { type: 'button', text: 'Reculer' });
+        re.addEventListener('click', () => deplacerAtelier(i, 1));
+        rangee.append(re);
+      }
+      const ret = el('button', { type: 'button', text: 'Retirer' });
+      ret.addEventListener('click', () => retirerAtelier(p));
+      rangee.append(ret);
+      ul.append(el('li', null, img, rangee));
+    });
+  }
+
+  async function sauverAtelier(mutateur, message) {
+    site = await modifierJSON(FICHIER_SITE, {}, (d) => { d.atelierPhotos = mutateur(Array.isArray(d.atelierPhotos) ? d.atelierPhotos : []); return d; }, message);
+    afficherAtelier();
+  }
+
+  function deplacerAtelier(i, sens) {
+    return action('Réorganisation', () => sauverAtelier((l) => {
+      const j = i + sens;
+      if (j < 0 || j >= l.length) return l;
+      [l[i], l[j]] = [l[j], l[i]];
+      return l;
+    }, 'Atelier : ordre des photos'));
+  }
+
+  function retirerAtelier(chemin) {
+    if (!window.confirm('Retirer cette photo de l\'atelier ?')) return;
+    return action('Suppression', async () => {
+      await sauverAtelier((l) => l.filter((x) => x !== chemin), 'Atelier : photo retirée');
+      try { await supprimerFichier(chemin); } catch (e) { /* photo déjà absente */ }
+    });
+  }
+
+  async function ajouterAtelier(fichiers) {
+    const zone = $('#statut-global');
+    const images = fichiers.filter((f) => f.type.startsWith('image/'));
+    $('#atelier-fichiers').value = '';
+    if (!images.length) return;
+    const ajoutes = [];
+    try {
+      for (let i = 0; i < images.length; i++) {
+        dire(zone, `Envoi de la photo ${i + 1} sur ${images.length}…`);
+        const b64 = await preparerImage(images[i]);
+        const chemin = `images/atelier/atelier-${Date.now().toString(36)}${i}.jpg`;
+        await ecrire(chemin, b64, 'Atelier : nouvelle photo');
+        ajoutes.push(chemin);
+      }
+      await sauverAtelier((l) => l.concat(ajoutes), `Atelier : ${ajoutes.length} photo(s) ajoutée(s)`);
+      dire(zone, 'Enregistré. Les photos apparaissent sur le site dans environ une minute.');
+    } catch (e) {
+      if (ajoutes.length) { try { await sauverAtelier((l) => l.concat(ajoutes), 'Atelier : photos ajoutées'); } catch (e2) { /* rien */ } }
+      dire(zone, e.message, true);
+    }
+  }
+
   /* ---------- Connexion ---------- */
 
   function stockage() {
@@ -176,11 +306,14 @@
       oublierConnexion();
       (souvenir ? localStorage : sessionStorage).setItem(CLE_STOCKAGE, JSON.stringify(connexion));
     } catch (e) { /* stockage indisponible : la connexion reste valable pour cette session */ }
+    try { localStorage.setItem('thallions-proprio', '1'); } catch (e) { /* rien */ }
     $('#f-connexion').token.value = '';
     $('#connexion').hidden = true;
     $('#espace').hidden = false;
     $('#deco').hidden = false;
     remplirTextes();
+    afficherAtelier();
+    majCompteurs();
     dire(msg, '');
   }
 
@@ -217,8 +350,9 @@
       suppr.addEventListener('click', () => supprimerCouteau(c));
       boutons.append(modifier, basculer, suppr);
 
+      const vues = el('span', { class: 'vues', 'data-id': c.id || '', text: texteVues(c.id) });
       ul.append(el('li', null,
-        vignette,
+        el('div', { class: 'vignette-col' }, vignette, vues),
         el('div', null,
           el('div', { class: 'nom-ligne', text: c.nom || 'Sans nom' }),
           el('div', { class: 'meta', text: `${LIBELLES[c.statut] || 'Disponible'} · ${prixTexte(c.prix)}` }),
@@ -232,6 +366,7 @@
     try {
       await tache();
       await rafraichir();
+      majCompteurs();
       dire(zone, 'Enregistré. Le site se met à jour dans environ une minute.');
     } catch (e) {
       dire(zone, e.message, true);
@@ -312,7 +447,7 @@
     const msg = $('#msg-editeur');
     for (const fichier of liste) {
       if (existantes.length + nouvelles.length >= MAX_PHOTOS) {
-        dire(msg, `Maximum ${MAX_PHOTOS} photos par couteau.`, true);
+        dire(msg, `${MAX_PHOTOS} photos au maximum par couteau : retirez-en une pour en ajouter une autre.`, true);
         break;
       }
       if (!fichier.type.startsWith('image/')) continue;
@@ -328,6 +463,8 @@
     const msg = $('#msg-editeur');
     const nom = f.elements.nom.value.trim();
     if (!nom) { dire(msg, 'Indiquez le nom du couteau.', true); return; }
+
+    if (existantes.length + nouvelles.length < 1) { dire(msg, 'Ajoutez au moins une photo (jusqu\'à 3).', true); return; }
 
     const prixBrut = parseFloat(f.elements.prix.value.replace(',', '.'));
     const lien = f.elements.lien.value.trim();
@@ -371,6 +508,7 @@
       nouvelles = [];
       $('#editeur').close();
       await rafraichir();
+      majCompteurs();
       dire($('#statut-global'), 'Enregistré. Le site se met à jour dans environ une minute.');
     } catch (err) {
       dire(msg, err.message, true);
@@ -387,6 +525,7 @@
     f.elements.intro.value = site.intro || '';
     f.elements.atelier.value = site.atelier || '';
     f.elements.email.value = site.email || '';
+    f.elements.compteur.value = site.compteur || '';
     f.elements.m_editeur.value = m.editeur || '';
     f.elements.m_statut.value = m.statut || '';
     f.elements.m_adresse.value = m.adresse || '';
@@ -397,12 +536,18 @@
   function enregistrerTextes(e) {
     e.preventDefault();
     const f = e.target.elements;
+    const code = f.compteur.value.trim().toLowerCase();
+    if (code && !/^[a-z0-9-]{2,40}$/.test(code)) {
+      dire($('#statut-global'), 'Le code GoatCounter ne peut contenir que des lettres minuscules, des chiffres et des tirets.', true);
+      return;
+    }
     return action('Enregistrement des textes', async () => {
       site = await modifierJSON(FICHIER_SITE, {}, (d) => Object.assign(d, {
         accroche: f.accroche.value.trim(),
         intro: f.intro.value.trim(),
         atelier: f.atelier.value.trim(),
         email: f.email.value.trim(),
+        compteur: code,
         mentions: {
           editeur: f.m_editeur.value.trim(),
           statut: f.m_statut.value.trim(),
@@ -417,11 +562,10 @@
   /* ---------- Mise en route ---------- */
 
   function choisirOnglet(nom) {
-    const couteauxActif = nom === 'couteaux';
-    $('#o-couteaux').setAttribute('aria-selected', couteauxActif ? 'true' : 'false');
-    $('#o-textes').setAttribute('aria-selected', couteauxActif ? 'false' : 'true');
-    $('#p-couteaux').hidden = !couteauxActif;
-    $('#p-textes').hidden = couteauxActif;
+    ['couteaux', 'atelier', 'textes'].forEach((n) => {
+      $('#o-' + n).setAttribute('aria-selected', n === nom ? 'true' : 'false');
+      $('#p-' + n).hidden = n !== nom;
+    });
   }
 
   function demarrer() {
@@ -438,7 +582,9 @@
 
     $('#deco').addEventListener('click', () => { oublierConnexion(); window.location.reload(); });
     $('#o-couteaux').addEventListener('click', () => choisirOnglet('couteaux'));
+    $('#o-atelier').addEventListener('click', () => choisirOnglet('atelier'));
     $('#o-textes').addEventListener('click', () => choisirOnglet('textes'));
+    $('#atelier-fichiers').addEventListener('change', (e) => ajouterAtelier(Array.from(e.target.files)));
     $('#ajouter').addEventListener('click', () => ouvrirEditeur(null));
     $('#annuler').addEventListener('click', () => $('#editeur').close());
     $('#photos-fichiers').addEventListener('change', (e) => ajouterFichiers(Array.from(e.target.files)));

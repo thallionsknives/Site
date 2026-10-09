@@ -43,7 +43,7 @@ button.bouton:disabled { opacity: .55; cursor: wait; }
 .barre h2 { margin: 0; }
 
 .liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-.liste li { display: grid; grid-template-columns: 72px 1fr; gap: 16px; align-items: center; background: var(--blanc); border: 1px solid var(--lame); border-radius: 2px; padding: 12px; }
+.liste li { display: grid; grid-template-columns: 84px 1fr; gap: 16px; align-items: center; background: var(--blanc); border: 1px solid var(--lame); border-radius: 2px; padding: 12px; }
 .liste .mini-photo { width: 72px; height: 90px; object-fit: cover; background: var(--papier); border: 1px solid var(--lame); }
 .liste .sans { display: grid; place-items: center; color: var(--lame); font-size: .8rem; }
 .liste .nom-ligne { font-family: var(--serif); font-size: 1.2rem; }
@@ -67,3 +67,20 @@ dialog { width: min(680px, calc(100% - 24px)); }
 @media (max-width: 560px) {
   .deux { grid-template-columns: 1fr; }
 }
+
+/* Compteurs de visites */
+.stats { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; background: var(--blanc); border: 1px solid var(--lame); border-radius: 2px; padding: 14px 18px; margin-bottom: 24px; }
+.stats p { margin: 0; }
+.stat-nombre { font-family: var(--serif); font-size: 2rem; line-height: 1; letter-spacing: -.01em; }
+.stat-texte { color: var(--gris); }
+.stats .aide { margin: 0; flex: 1 1 260px; }
+.liste .vignette-col { display: grid; gap: 6px; justify-items: center; }
+.liste .vues { font-size: .82rem; color: var(--gris); white-space: nowrap; }
+
+/* Photos de l'atelier */
+.atelier-liste { margin-top: 20px; }
+.atelier-liste li { display: grid; gap: 6px; background: none; border: 0; padding: 0; }
+
+
+/* La page privée n'a pas de bandeau fixe : on annule la marge réservée au bandeau du site */
+body.adm { padding-top: 0; }

@@ -11,6 +11,7 @@
     "siret": "",
     "telephone": ""
   },
-  "imageAccueil": "images/hero.jpg"
+  "imageAccueil": "images/hero.jpg",
+  "compteur": "",
+  "atelierPhotos": []
 }
-

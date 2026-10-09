@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>Espace privé</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.github.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.github.com https://*.goatcounter.com; base-uri 'none'; form-action 'none'; object-src 'none'">
   <link rel="icon" href="favicon.png" type="image/png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,300..500&display=swap">
   <link rel="stylesheet" href="style.css">
@@ -50,8 +50,14 @@
   </section>
 
   <section id="espace" hidden>
+    <div class="stats" aria-live="polite">
+      <p class="stat"><span class="stat-nombre" id="stat-total">…</span> <span class="stat-texte">visites du site</span></p>
+      <p class="aide" id="stat-note"></p>
+    </div>
+
     <div class="onglets" role="tablist" aria-label="Sections">
       <button type="button" role="tab" id="o-couteaux" aria-selected="true" aria-controls="p-couteaux">Couteaux</button>
+      <button type="button" role="tab" id="o-atelier" aria-selected="false" aria-controls="p-atelier">Photos de l'atelier</button>
       <button type="button" role="tab" id="o-textes" aria-selected="false" aria-controls="p-textes">Textes du site</button>
     </div>
 
@@ -62,6 +68,15 @@
       </div>
       <p class="aide">Les changements apparaissent sur le site au bout d'une minute environ.</p>
       <ul id="liste" class="liste"></ul>
+    </div>
+
+    <div id="p-atelier" role="tabpanel" aria-labelledby="o-atelier" hidden>
+      <h2>Photos de l'atelier</h2>
+      <p class="aide">Ces photos apparaissent sous le texte de la partie « L'atelier », dans l'ordre ci-dessous. Vous pouvez en ajouter autant que vous voulez. Chaque ajout ou retrait est enregistré tout de suite.</p>
+      <label class="fichier">Ajouter des photos
+        <input id="atelier-fichiers" type="file" accept="image/*" multiple>
+      </label>
+      <ul id="atelier-liste" class="photos-liste atelier-liste"></ul>
     </div>
 
     <div id="p-textes" role="tabpanel" aria-labelledby="o-textes" hidden>
@@ -79,6 +94,12 @@
         <label>E-mail de contact
           <input name="email" type="email" required>
         </label>
+        <h3>Compteur de visites</h3>
+        <p class="aide">Le compteur utilise le service gratuit GoatCounter. Après avoir créé votre compte sur goatcounter.com, indiquez ici le code choisi (la partie avant « .goatcounter.com »). Laissez vide pour ne rien compter.</p>
+        <label>Code GoatCounter
+          <input name="compteur" maxlength="40" spellcheck="false" autocapitalize="off" placeholder="thallions">
+        </label>
+
         <h3>Mentions légales</h3>
         <p class="aide">Ces informations sont obligatoires pour un site qui vend. Complétez-les avant de communiquer l'adresse du site.</p>
         <label>Nom ou raison sociale
@@ -148,7 +169,7 @@
       <label class="fichier">Ajouter des photos
         <input id="photos-fichiers" type="file" accept="image/*" multiple>
       </label>
-      <p class="aide">La première photo est celle de la collection. Les photos sont réduites automatiquement pour que le site reste rapide.</p>
+      <p class="aide">Choisissez 1, 2 ou 3 photos par couteau. La première est celle de la collection, la deuxième apparaît quand on passe la souris dessus. Les photos sont réduites automatiquement pour que le site reste rapide.</p>
     </fieldset>
 
     <p id="msg-editeur" class="message" role="status" aria-live="polite"></p>

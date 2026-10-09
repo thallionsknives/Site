@@ -6,7 +6,7 @@
   <title>Les couteaux de Thallions</title>
   <meta name="description" content="Couteaux faits main, en petite quantité. Découvrez la collection et écrivez à l'atelier pour en acquérir un.">
   <meta name="theme-color" content="#F6F7F7">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.goatcounter.com; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <link rel="icon" href="favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,8 +20,9 @@
 <header class="entete" id="entete">
   <div class="conteneur entete-ligne">
     <a class="marque" href="#haut" aria-label="Les couteaux de Thallions, retour en haut">
-      <img src="images/logo.png" alt="Logo Thallions" width="352" height="360">
+      <img src="images/logo-cercle.png" alt="Logo Thallions" width="400" height="400">
     </a>
+    <p class="en-construction"><span>Site en construction</span></p>
     <nav aria-label="Navigation principale">
       <ul class="menu">
         <li><a href="#collection">Collection</a></li>
@@ -82,6 +83,7 @@
     <div class="conteneur">
       <h2 class="reveal" id="titre-atelier">L'atelier</h2>
       <p class="texte-long reveal" id="atelier-texte">Chaque couteau est conçu et fabriqué à la main, en petite quantité. Les matériaux, les finitions et les dimensions sont indiqués sur chaque fiche.</p>
+      <div class="atelier-galerie" id="atelier-galerie" hidden></div>
     </div>
   </section>
 
@@ -121,8 +123,20 @@
     <h3>Données personnelles</h3>
     <p>Ce site ne dépose aucun cookie et ne collecte aucune donnée. Les messages envoyés par e-mail ne servent qu'à répondre à votre demande. Vous pouvez demander l'accès, la rectification ou la suppression de vos données en écrivant à l'adresse de l'éditeur. Les polices de caractères sont chargées depuis Google Fonts, ce qui transmet l'adresse IP du visiteur à Google.</p>
 
+    <h3>Mesure d'audience</h3>
+    <p>Le nombre de visites est compté de façon anonyme avec le service GoatCounter (goatcounter.com), qui n'utilise aucun cookie.</p>
+
     <h3>Ventes</h3>
     <p>Les ventes se concluent par échange direct avec l'éditeur. Les conditions de paiement et de livraison sont précisées avant toute commande.</p>
+  </div>
+</dialog>
+
+<dialog id="zoom" class="dialogue-zoom" aria-label="Photo agrandie">
+  <button type="button" class="fermer" id="zoom-fermer" aria-label="Fermer la photo">Fermer</button>
+  <img id="zoom-img" alt="">
+  <div class="zoom-nav">
+    <button type="button" id="zoom-prec" class="zoom-bouton" aria-label="Photo précédente">&larr;</button>
+    <button type="button" id="zoom-suiv" class="zoom-bouton" aria-label="Photo suivante">&rarr;</button>
   </div>
 </dialog>
 

@@ -43,24 +43,38 @@ a { color: inherit; }
 }
 .evitement:focus { top: 12px; }
 
-/* En-tête : reste fixé en haut, se resserre et s'ombre légèrement au défilement */
+/* En-tête : fixé en haut de l'écran (hors du flux de la page), donc sa taille peut changer
+   au défilement sans jamais déplacer le contenu : plus de tremblement. */
+:root { --h-entete: 92px; }
+body { padding-top: var(--h-entete); }
 .entete {
-  position: sticky; top: 0; z-index: 20;
-  padding-block: 18px;
-  background: rgba(246, 247, 247, .92);
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  padding-block: 14px;
+  background: rgba(246, 247, 247, .94);
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-  transition: padding .35s ease, box-shadow .35s ease, background-color .35s ease;
+  transition: padding .3s ease, box-shadow .3s ease, background-color .3s ease;
 }
-.entete.defile { padding-block: 8px; box-shadow: 0 1px 0 var(--lame), 0 8px 24px -16px rgba(21, 26, 29, .35); background: rgba(246, 247, 247, .97); }
-.entete-ligne { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.entete.defile { padding-block: 7px; box-shadow: 0 1px 0 var(--lame), 0 8px 24px -16px rgba(21, 26, 29, .35); background: rgba(246, 247, 247, .98); }
+.entete-ligne { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+
+/* Logo : le cercle noir, et dedans le logo recentré pour qu'il ne touche jamais le bord */
 .marque {
   display: grid; place-items: center; flex: none;
-  width: 60px; height: 60px; border: 2px solid var(--encre); border-radius: 50%;
-  transition: width .35s ease, height .35s ease;
+  width: 64px; height: 64px; border: 2px solid var(--encre); border-radius: 50%;
+  transition: width .3s ease, height .3s ease;
 }
-.marque img { height: 36px; width: auto; transition: height .35s ease; }
-.entete.defile .marque { width: 46px; height: 46px; }
-.entete.defile .marque img { height: 28px; }
+.marque img { width: 52px; height: 52px; transition: width .3s ease, height .3s ease; }
+.entete.defile .marque { width: 50px; height: 50px; }
+.entete.defile .marque img { width: 40px; height: 40px; }
+
+.en-construction { flex: 1; display: flex; justify-content: center; margin: 0; }
+.en-construction span {
+  display: inline-flex; align-items: center; gap: 9px; white-space: nowrap;
+  padding: .32em 1em; border: 1px solid var(--lame); border-radius: 999px;
+  color: var(--gris); font-size: .84rem; font-weight: 500;
+}
+.en-construction span::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--laiton); }
+
 .menu { display: flex; align-items: center; gap: clamp(16px, 3vw, 36px); list-style: none; margin: 0; padding: 0; }
 .menu li { display: flex; align-items: center; }
 .menu a { display: inline-flex; align-items: center; height: 28px; line-height: 1; text-decoration: none; color: var(--gris); font-weight: 500; font-size: .95rem; }
@@ -80,16 +94,16 @@ html { scroll-padding-top: 76px; }
 .hero-voile { display: none; }
 
 /* Avec la photo : elle occupe tout le fond et le titre se pose par-dessus */
-.hero.avec-photo { display: flex; align-items: flex-end; isolation: isolate; overflow: hidden; min-height: clamp(540px, calc(100svh - 76px), 880px); }
-.hero.avec-photo .hero-contenu { padding-bottom: clamp(40px, 7vw, 88px); }
+.hero.avec-photo { display: flex; align-items: flex-start; isolation: isolate; overflow: hidden; min-height: clamp(540px, calc(100svh - var(--h-entete)), 880px); }
+.hero.avec-photo .hero-contenu { padding-top: clamp(32px, 6vw, 72px); padding-bottom: clamp(40px, 6vw, 72px); }
 .hero.avec-photo .lame { display: none; }
 .hero-fond { position: absolute; inset: 0; margin: 0; z-index: -2; background: var(--acier); }
 .hero-fond img { width: 100%; height: 100%; object-fit: cover; object-position: 68% 50%; animation: fondu 1.2s ease both; }
 .hero.avec-photo .hero-voile {
   display: block; position: absolute; inset: 0; z-index: -1;
   background:
-    linear-gradient(to top, rgba(21, 26, 29, .84) 0%, rgba(21, 26, 29, .5) 40%, rgba(21, 26, 29, .12) 75%),
-    linear-gradient(to right, rgba(21, 26, 29, .5), rgba(21, 26, 29, 0) 62%);
+    linear-gradient(to bottom, rgba(21, 26, 29, .8) 0%, rgba(21, 26, 29, .5) 34%, rgba(21, 26, 29, .08) 64%),
+    linear-gradient(to right, rgba(21, 26, 29, .45), rgba(21, 26, 29, 0) 62%);
 }
 .hero.avec-photo h1 { color: var(--laiton); }
 .hero.avec-photo .intro { color: #E6EBED; }
@@ -121,7 +135,7 @@ h1 {
 .fond-contact .texte-long { color: var(--encre); }
 
 /* Autoriser les retours à la ligne*/
-#atelier {
+#atelier-texte {
     white-space: pre-line;
 }
 
@@ -207,6 +221,25 @@ dialog::backdrop { background: rgba(21, 26, 29, .6); }
 .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .9s ease, transform .9s cubic-bezier(.2, .7, .2, 1); transition-delay: var(--d, 0ms); }
 .js .reveal.visible { opacity: 1; transform: none; }
 
+/* Galerie de l'atelier : autant de photos que l'on veut, chacune dans sa proportion */
+.atelier-galerie { columns: 3 260px; column-gap: 16px; margin-top: clamp(28px, 4vw, 48px); }
+.atelier-photo { display: block; width: 100%; margin: 0 0 16px; padding: 0; border: 0; background: none; cursor: zoom-in; break-inside: avoid; }
+.atelier-photo img { display: block; width: 100%; height: auto; border-radius: 2px; transition: opacity .3s ease; }
+.atelier-photo:hover img { opacity: .88; }
+
+/* Visionneuse : une photo en grand, flèches pour passer à la suivante */
+.dialogue-zoom { width: min(1100px, calc(100% - 24px)); background: var(--encre); padding: 0; }
+.dialogue-zoom::backdrop { background: rgba(21, 26, 29, .85); }
+#zoom-img { display: block; width: 100%; max-height: calc(100dvh - 90px); object-fit: contain; }
+.zoom-nav { display: flex; justify-content: space-between; padding: 10px; }
+.zoom-bouton { font: 500 1.2rem var(--sans); color: #fff; background: transparent; border: 1px solid #5B666C; border-radius: 2px; padding: .3em 1em; cursor: pointer; }
+.zoom-bouton:hover { border-color: #fff; }
+
+/* Photo secondaire d'un couteau : elle apparaît au survol de la vignette */
+.vignette { position: relative; }
+.vignette .seconde { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease; }
+.carte:hover .vignette .seconde { opacity: 1; }
+
 /* Pied de page et fenêtre des mentions légales */
 .pied { background: var(--encre); color: #AEB8BD; font-size: .93rem; }
 .pied-ligne { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-block: 22px; }
@@ -222,15 +255,25 @@ dialog::backdrop { background: rgba(21, 26, 29, .6); }
 .mentions h3 { font: 600 .95rem var(--sans); color: var(--encre); margin: 1.6em 0 .3em; }
 .mentions p { margin: 0; max-width: 70ch; }
 
-@media (max-width: 560px) {
-  .marque { width: 48px; height: 48px; }
-  .marque img { height: 29px; }
-  .entete.defile .marque { width: 40px; height: 40px; }
-  .entete.defile .marque img { height: 24px; }
+@media (max-width: 700px) {
+  :root { --h-entete: 100px; }
+  .entete { padding-block: 10px; }
+  .entete.defile { padding-block: 6px; }
+  .entete-ligne { flex-wrap: wrap; row-gap: 6px; }
+  .en-construction { order: 3; flex-basis: 100%; max-height: 22px; overflow: hidden; transition: max-height .3s ease, opacity .3s ease; }
+  .en-construction span { border: 0; padding: 0; font-size: .76rem; }
+  .entete.defile .en-construction { max-height: 0; opacity: 0; }
+  .marque { width: 52px; height: 52px; }
+  .marque img { width: 41px; height: 41px; }
+  .entete.defile .marque { width: 42px; height: 42px; }
+  .entete.defile .marque img { width: 33px; height: 33px; }
   .menu { gap: 14px; }
   .menu a { font-size: .88rem; }
+  html { scroll-padding-top: 70px; }
+}
+
+@media (max-width: 560px) {
   .insta-texte { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  html { scroll-padding-top: 66px; }
 }
 
 @media (max-width: 760px) {
@@ -248,6 +291,6 @@ dialog::backdrop { background: rgba(21, 26, 29, .6); }
   .hero-fond img { animation: none; }
   .lame .trace { animation: none; stroke-dashoffset: 0; }
   .lame .laiton { animation: none; opacity: 1; }
-  .vignette img { transition: none; }
+  .vignette img, .vignette .seconde { transition: none; }
   .carte:hover .vignette img { transform: none; }
 }
