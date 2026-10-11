@@ -141,7 +141,11 @@
     g.fillRect(0, 0, canvas.width, canvas.height);
     g.drawImage(bmp, 0, 0, canvas.width, canvas.height);
     if (bmp.close) bmp.close();
-    return canvas.toDataURL('image/jpeg', 0.86).split(',')[1];
+    // WebP si le navigateur sait l'écrire, sinon JPEG
+    let url = canvas.toDataURL('image/webp', 0.85);
+    let ext = 'webp';
+    if (!url.startsWith('data:image/webp')) { url = canvas.toDataURL('image/jpeg', 0.86); ext = 'jpg'; }
+    return { b64: url.split(',')[1], ext };
   }
 
   /* ---------- Compteurs de visites (GoatCounter) ---------- */
@@ -260,8 +264,8 @@
     try {
       for (let i = 0; i < images.length; i++) {
         dire(zone, `Envoi de la photo ${i + 1} sur ${images.length}…`);
-        const b64 = await preparerImage(images[i]);
-        const chemin = `images/atelier/atelier-${Date.now().toString(36)}${i}.jpg`;
+        const { b64, ext } = await preparerImage(images[i]);
+        const chemin = `images/atelier/atelier-${Date.now().toString(36)}${i}.${ext}`;
         await ecrire(chemin, b64, 'Atelier : nouvelle photo');
         ajoutes.push(chemin);
       }
@@ -476,8 +480,8 @@
     try {
       for (let i = 0; i < nouvelles.length; i++) {
         dire(msg, `Envoi de la photo ${i + 1} sur ${nouvelles.length}…`);
-        const b64 = await preparerImage(nouvelles[i].file);
-        const chemin = `images/couteaux/${id}-${Date.now().toString(36)}${i}.jpg`;
+        const { b64, ext } = await preparerImage(nouvelles[i].file);
+        const chemin = `images/couteaux/${id}-${Date.now().toString(36)}${i}.${ext}`;
         await ecrire(chemin, b64, `Photo : ${nom}`);
         photos.push(chemin);
       }
