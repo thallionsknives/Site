@@ -3,6 +3,11 @@
    Les couteaux viennent de data/knives.json et les textes de data/site.json :
    on les modifie depuis la page privée, pas ici. */
 (() => {
+  // Force le HTTPS (hors test local)
+  if (location.protocol === 'http:' && !/^(localhost|127\.|\[::1\])/.test(location.hostname)) {
+    location.replace('https:' + location.href.substring(location.protocol.length));
+    return;
+  }
   const $ = (sel, racine = document) => racine.querySelector(sel);
 
   const CHEMIN_OK = /^images\/[A-Za-z0-9_\-./]+$/;
@@ -114,7 +119,7 @@
     const st = statutDe(c);
     const vignette = el('figure', { class: 'vignette' });
     if (photos.length) {
-      vignette.append(el('img', { src: photos[0], alt: '', loading: 'lazy', decoding: 'async' }));
+      vignette.append(el('img', { src: photos[0], alt: `Couteau ${c.nom || ''} fait main`.trim(), loading: 'lazy', decoding: 'async' }));
       if (photos.length > 1 && st !== 'vendu') {
         vignette.append(el('img', { class: 'seconde', src: photos[1], alt: '', loading: 'lazy', decoding: 'async' }));
       }
@@ -134,6 +139,22 @@
     return bouton;
   }
 
+  // Données structurées (SEO) : un « Product » par couteau
+  function donneesStructurees() {
+    let n = document.getElementById('ld-couteaux');
+    if (!n) { n = document.createElement('script'); n.type = 'application/ld+json'; n.id = 'ld-couteaux'; document.head.append(n); }
+    const base = new URL('.', location.href).href;
+    const items = couteaux.filter((c) => (c.photos || []).length).map((c) => {
+      const st = statutDe(c);
+      const p = { '@type': 'Product', name: c.nom, image: new URL(c.photos[0], base).href, brand: { '@type': 'Brand', name: 'Les couteaux de Thallions' } };
+      if (c.description) p.description = c.description;
+      if (c.manche) p.material = c.manche;
+      if (c.prix) p.offers = { '@type': 'Offer', price: String(c.prix), priceCurrency: 'EUR', availability: st === 'disponible' ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut', url: base + '#collection' };
+      return p;
+    });
+    n.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': items });
+  }
+
   function rendre() {
     const grille = $('#grille');
     grille.replaceChildren();
@@ -146,6 +167,7 @@
       surveiller(b);
     });
     $('#vide').hidden = liste.length > 0;
+    donneesStructurees();
     const dispo = couteaux.filter((c) => statutDe(c) === 'disponible').length;
     $('#compte').textContent = couteaux.length
       ? `${dispo} disponible${dispo > 1 ? 's' : ''} sur ${couteaux.length}`
@@ -162,7 +184,7 @@
 
     const galerie = el('div', { class: 'galerie' });
     const grande = photos.length
-      ? el('img', { class: 'grande', src: photos[0], alt: c.nom || '' })
+      ? el('img', { class: 'grande', src: photos[0], alt: `Couteau ${c.nom || ''} fait main`.trim() })
       : sansPhoto();
     galerie.append(grande);
     if (photos.length > 1) {
@@ -256,7 +278,7 @@
   /* Photo d'accueil : chemin réglable dans data/site.json (clé « imageAccueil »).
      Si le fichier est absent, le dessin de couteau reste affiché. */
   function afficherPhotoAccueil() {
-    const chemin = site.imageAccueil || 'images/hero.jpg';
+    const chemin = site.imageAccueil || 'images/hero.webp';
     if (!CHEMIN_OK.test(chemin)) return;
     const img = $('#hero-img');
     img.addEventListener('load', () => {

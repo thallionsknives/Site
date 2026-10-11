@@ -11,7 +11,7 @@
       "lienAchat": "",
       "description": "",
       "photos": [
-        "images/couteaux/sommelier-mv19vjdn-mv19vjeb0.jpg"
+        "images/couteaux/sommelier-mv19vjdn-mv19vjeb0.webp"
       ],
       "date": "2026-10-09"
     },
@@ -26,7 +26,7 @@
       "lienAchat": "",
       "description": "Kiridashi \n- Manche en pêcher stabilisé\n- Lame acier inoxydable X50CrMoV15",
       "photos": [
-        "images/couteaux/kiridashi-mv19elug-mv19elwg0.jpg"
+        "images/couteaux/kiridashi-mv19elug-mv19elwg0.webp"
       ],
       "date": "2026-10-09"
     },
@@ -41,8 +41,8 @@
       "lienAchat": "",
       "description": "Couteau à huitre\n- Manche ergonomique en pêcher\n- lame inoxydable: X50CrMoV15 avec guillochage\n- Rivet mosaïque",
       "photos": [
-        "images/couteaux/laurent-mv191pmy-mv191pp10.jpg",
-        "images/couteaux/laurent-mv191pmy-mv191r3d1.jpg"
+        "images/couteaux/laurent-mv191pmy-mv191pp10.webp",
+        "images/couteaux/laurent-mv191pmy-mv191r3d1.webp"
       ],
       "date": "2026-10-09"
     },
@@ -57,8 +57,8 @@
       "lienAchat": "",
       "description": "Couteau pliant \nManche en frêne stabilisé rose\nLame X50CrMoV15",
       "photos": [
-        "images/couteaux/exemple-chef-mv18igtb0.jpg",
-        "images/couteaux/exemple-chef-mv18iisg1.jpg"
+        "images/couteaux/exemple-chef-mv18igtb0.webp",
+        "images/couteaux/exemple-chef-mv18iisg1.webp"
       ],
       "date": "2026-10-07"
     },
@@ -73,7 +73,7 @@
       "lienAchat": "",
       "description": "Couteau de service\n-Manche en frêne stabilisé naturel et rose\n-Lame XC75",
       "photos": [
-        "images/couteaux/exemple-office-mv18pgt40.jpg"
+        "images/couteaux/exemple-office-mv18pgt40.webp"
       ],
       "date": "2026-10-07"
     },
@@ -88,7 +88,7 @@
       "lienAchat": "",
       "description": "Couteau fixe\n-manche en frêne stabilisé gris\n-lame XC75 avec guillochage",
       "photos": [
-        "images/couteaux/exemple-vendu-mv18upbl0.jpg"
+        "images/couteaux/exemple-vendu-mv18upbl0.webp"
       ],
       "date": "2026-10-07"
     }

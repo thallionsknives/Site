@@ -62,7 +62,7 @@ Avant de vendre : complétez les mentions légales (onglet « Textes du site »)
 
 ## 6. Photo de la page d'accueil
 
-La photo à côté du titre est lue dans `images/hero.jpg` (elle est déjà incluse). Pour la changer, remplacez ce fichier par une autre photo de même nom (de préférence en paysage, rapport 3:2), via Add file > Upload files dans le dossier `images` de GitHub.
+La photo à côté du titre est lue dans `images/hero.webp` (elle est déjà incluse). Pour la changer, remplacez ce fichier par une autre photo de même nom (de préférence en paysage, rapport 3:2), via Add file > Upload files dans le dossier `images` de GitHub.
 Si votre nouveau fichier porte un autre nom ou un autre format (par exemple `images/finition.png`), écrivez ce chemin dans `data/site.json`, à la ligne `"imageAccueil"`.
 
 ## 7. Photos : couteaux et atelier
