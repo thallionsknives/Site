@@ -156,16 +156,17 @@
   }
 
   /* Renvoie le nombre affiché par GoatCounter, '0' si rien n'est encore compté, ou null si illisible. */
+  let diagnostic = '';
   async function lireCompteur(chemin) {
     const code = codeCompteur();
     if (!code) return null;
     try {
       const r = await fetch(`https://${code}.goatcounter.com/counter/${encodeURIComponent(chemin)}.json`, { cache: 'no-store' });
       if (r.status === 404) return '0';
-      if (!r.ok) return null;
+      if (!r.ok) { diagnostic = `GoatCounter a répondu « erreur ${r.status} ».`; return null; }
       const d = await r.json();
       return String(d.count).replace(/\s/g, '\u202f');
-    } catch (e) { return null; }
+    } catch (e) { diagnostic = 'Le navigateur n\'a pas pu lire GoatCounter (réglage « Allow adding visitor counts… » désactivé, ou bloqueur de publicités actif sur cette page).'; return null; }
   }
 
   function texteVues(id) {
@@ -192,7 +193,7 @@
     couteaux.forEach((c, i) => { comptes[c.id] = autres[i]; });
     document.querySelectorAll('.vues').forEach((n) => { n.textContent = texteVues(n.dataset.id); });
     if (t === null) {
-      note.textContent = 'Compteur illisible. Vérifiez le code, et dans GoatCounter (Settings) l\'option « Allow adding visitor counts on your website ».';
+      note.textContent = `Compteur illisible. ${diagnostic} Vérifiez le code « ${codeCompteur()} » (c'est le début de l'adresse de votre GoatCounter) et, dans GoatCounter > Settings, l'option « Allow adding visitor counts on your website ».`;
     } else {
       note.textContent = 'Visites depuis le début. Vos propres visites, faites depuis un appareil où vous vous êtes connecté ici, ne sont pas comptées. Les visiteurs qui bloquent les traceurs ne le sont pas non plus : ce sont donc des chiffres minimaux.';
     }
@@ -216,21 +217,13 @@
       const img = el('img', { src: p, alt: `Photo ${i + 1} de l'atelier` });
       img.addEventListener('error', () => { img.alt = 'En cours de publication…'; });
       const rangee = el('div', { class: 'rangee' });
-      if (i > 0) {
-        const av = el('button', { type: 'button', text: 'Avancer' });
-        av.addEventListener('click', () => deplacerAtelier(i, -1));
-        rangee.append(av);
-      }
-      if (i < photos.length - 1) {
-        const re = el('button', { type: 'button', text: 'Reculer' });
-        re.addEventListener('click', () => deplacerAtelier(i, 1));
-        rangee.append(re);
-      }
+      if (photos.length > 1) rangee.append(el('button', { type: 'button', class: 'poignee', text: '⠿ Glisser', title: 'Glisser pour déplacer (ou flèches du clavier)' }));
       const ret = el('button', { type: 'button', text: 'Retirer' });
       ret.addEventListener('click', () => retirerAtelier(p));
       rangee.append(ret);
-      ul.append(el('li', null, img, rangee));
+      ul.append(el('li', { 'data-cle': p }, img, rangee));
     });
+    activerTri(ul, (ordre) => reordonnerAtelier(ordre));
   }
 
   async function sauverAtelier(mutateur, message) {
@@ -238,13 +231,71 @@
     afficherAtelier();
   }
 
-  function deplacerAtelier(i, sens) {
-    return action('Réorganisation', () => sauverAtelier((l) => {
-      const j = i + sens;
-      if (j < 0 || j >= l.length) return l;
-      [l[i], l[j]] = [l[j], l[i]];
-      return l;
-    }, 'Atelier : ordre des photos'));
+  function reordonner(liste, ordre, cle) {
+    const connus = ordre.filter((k) => liste.some((x) => cle(x) === k));
+    const reste = liste.filter((x) => !connus.includes(cle(x)));
+    return connus.map((k) => liste.find((x) => cle(x) === k)).concat(reste);
+  }
+
+  function reordonnerAtelier(ordre) {
+    return action('Réorganisation', () => sauverAtelier((l) => reordonner(l, ordre, (x) => x), 'Atelier : ordre des photos'));
+  }
+
+  function reordonnerCouteaux(ordre) {
+    return action('Réorganisation', () => modifierJSON(FICHIER_COUTEAUX, { couteaux: [] }, (d) => {
+      d.couteaux = reordonner(d.couteaux || [], ordre, (x) => x.id);
+      return d;
+    }, 'Ordre des couteaux'));
+  }
+
+  /* Glisser-déposer (souris et doigt) : on attrape la poignée « ⠿ » et on déplace l'élément ;
+     au clavier, la poignée réagit aux flèches. */
+  function activerTri(liste, surFin) {
+    const ordreActuel = () => [...liste.children].map((n) => n.dataset.cle).filter(Boolean);
+    liste.querySelectorAll('.poignee').forEach((p) => {
+      const item = p.closest('li');
+      p.addEventListener('pointerdown', (ev) => {
+        if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+        ev.preventDefault();
+        const avant = ordreActuel().join('|');
+        item.classList.add('deplace');
+        liste.classList.add('en-tri');
+        const bouger = (e) => {
+          if (e.clientY < 70) window.scrollBy(0, -14);
+          else if (e.clientY > window.innerHeight - 70) window.scrollBy(0, 14);
+          const sous = document.elementFromPoint(e.clientX, e.clientY);
+          const autre = sous && sous.closest ? sous.closest('li') : null;
+          if (!autre || autre === item || autre.parentNode !== liste || !autre.dataset.cle) return;
+          if (item.compareDocumentPosition(autre) & Node.DOCUMENT_POSITION_FOLLOWING) autre.after(item);
+          else autre.before(item);
+        };
+        const fin = () => {
+          document.removeEventListener('pointermove', bouger);
+          document.removeEventListener('pointerup', fin);
+          document.removeEventListener('pointercancel', fin);
+          item.classList.remove('deplace');
+          liste.classList.remove('en-tri');
+          const apres = ordreActuel();
+          if (apres.join('|') !== avant) surFin(apres);
+        };
+        // Écoute sur le document : l'élément est replacé dans la liste pendant le glissement
+        document.addEventListener('pointermove', bouger);
+        document.addEventListener('pointerup', fin);
+        document.addEventListener('pointercancel', fin);
+      });
+      let attente;
+      p.addEventListener('keydown', (e) => {
+        const sens = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[e.key];
+        if (!sens) return;
+        e.preventDefault();
+        const voisin = sens < 0 ? item.previousElementSibling : item.nextElementSibling;
+        if (!voisin || !voisin.dataset.cle) return;
+        if (sens < 0) voisin.before(item); else voisin.after(item);
+        p.focus();
+        clearTimeout(attente);
+        attente = setTimeout(() => surFin(ordreActuel()), 700);
+      });
+    });
   }
 
   function retirerAtelier(chemin) {
@@ -355,13 +406,15 @@
       boutons.append(modifier, basculer, suppr);
 
       const vues = el('span', { class: 'vues', 'data-id': c.id || '', text: texteVues(c.id) });
-      ul.append(el('li', null,
+      ul.append(el('li', { 'data-cle': c.id || '' },
+        couteaux.length > 1 ? el('button', { type: 'button', class: 'poignee', text: '⠿ Glisser', title: 'Glisser pour changer l\'ordre (ou flèches du clavier)' }) : null,
         el('div', { class: 'vignette-col' }, vignette, vues),
         el('div', null,
           el('div', { class: 'nom-ligne', text: c.nom || 'Sans nom' }),
           el('div', { class: 'meta', text: `${LIBELLES[c.statut] || 'Disponible'} · ${prixTexte(c.prix)}` }),
           boutons)));
     });
+    activerTri(ul, (ordre) => reordonnerCouteaux(ordre));
   }
 
   async function action(libelle, tache) {

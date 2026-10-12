@@ -186,7 +186,15 @@
     const grande = photos.length
       ? el('img', { class: 'grande', src: photos[0], alt: `Couteau ${c.nom || ''} fait main`.trim() })
       : sansPhoto();
-    galerie.append(grande);
+    let courant = 0;
+    if (photos.length) {
+      const nomPhoto = (k, n) => `Couteau ${c.nom || ''} fait main, photo ${k + 1} sur ${n}`.trim();
+      const loupe = el('button', { type: 'button', class: 'zoom-btn', 'aria-label': 'Agrandir la photo' }, grande);
+      loupe.addEventListener('click', () => ouvrirZoom(courant, loupe, photos, nomPhoto));
+      galerie.append(loupe);
+    } else {
+      galerie.append(grande);
+    }
     if (photos.length > 1) {
       const minis = el('div', { class: 'minis' });
       photos.forEach((p, i) => {
@@ -197,6 +205,7 @@
         }, el('img', { src: p, alt: '' }));
         b.addEventListener('click', () => {
           grande.src = p;
+          courant = i;
           minis.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
         });
         minis.append(b);
@@ -236,6 +245,8 @@
 
   /* Galerie de l'atelier : liste « atelierPhotos » de data/site.json (autant de photos que l'on veut) */
   let photosAtelier = [];
+  let photosZoom = [];
+  let etiquetteZoom = (i, n) => `Photo ${i + 1} sur ${n} de l'atelier`;
   let indexZoom = 0;
 
   function afficherAtelier() {
@@ -254,15 +265,17 @@
 
   function montrerZoom() {
     const img = $('#zoom-img');
-    img.src = photosAtelier[indexZoom];
-    img.alt = `Photo ${indexZoom + 1} sur ${photosAtelier.length} de l'atelier`;
-    const seule = photosAtelier.length < 2;
+    img.src = photosZoom[indexZoom];
+    img.alt = etiquetteZoom(indexZoom, photosZoom.length);
+    const seule = photosZoom.length < 2;
     $('#zoom-prec').hidden = seule;
     $('#zoom-suiv').hidden = seule;
   }
 
-  function ouvrirZoom(i, declencheur) {
+  function ouvrirZoom(i, declencheur, liste, etiquette) {
     const dlg = $('#zoom');
+    photosZoom = liste || photosAtelier;
+    etiquetteZoom = etiquette || ((k, n) => `Photo ${k + 1} sur ${n} de l'atelier`);
     indexZoom = i;
     dlg._retour = declencheur;
     montrerZoom();
@@ -270,8 +283,8 @@
   }
 
   function pasZoom(sens) {
-    if (photosAtelier.length < 2) return;
-    indexZoom = (indexZoom + sens + photosAtelier.length) % photosAtelier.length;
+    if (photosZoom.length < 2) return;
+    indexZoom = (indexZoom + sens + photosZoom.length) % photosZoom.length;
     montrerZoom();
   }
 

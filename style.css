@@ -198,6 +198,7 @@ dialog::backdrop { background: rgba(21, 26, 29, .6); }
 .fiche-corps { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
 .galerie { background: var(--papier); padding: clamp(14px, 2vw, 24px); }
 .galerie .grande { display: block; width: auto; height: auto; max-width: 100%; max-height: min(78dvh, 720px); margin-inline: auto; border: 1px solid var(--lame); background: var(--blanc); }
+.galerie .zoom-btn { display: block; max-width: 100%; margin-inline: auto; padding: 0; border: 0; background: none; cursor: zoom-in; }
 .galerie .sans-photo { aspect-ratio: 4 / 5; border: 1px solid var(--lame); }
 .minis { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .mini { width: 64px; height: 64px; padding: 0; border: 1px solid var(--lame); background: var(--blanc); cursor: pointer; }
@@ -264,7 +265,6 @@ dialog::backdrop { background: rgba(21, 26, 29, .6); }
   .entete-ligne { flex-wrap: wrap; row-gap: 6px; }
   .en-construction { order: 3; flex-basis: 100%; max-height: 22px; overflow: hidden; transition: max-height .3s ease, opacity .3s ease; }
   .en-construction span { border: 0; padding: 0; font-size: .76rem; }
-  .entete.defile .en-construction { max-height: 0; opacity: 0; }
   .marque { width: 52px; height: 52px; }
   .marque img { width: 41px; height: 41px; }
   .entete.defile .marque { width: 42px; height: 42px; }
