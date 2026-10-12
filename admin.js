@@ -18,7 +18,7 @@
   let existantes = [];
   let aRetirer = [];
   let nouvelles = [];
-  let comptes = {};
+  let bruts = {};
 
   /* ---------- Utilitaires ---------- */
 
@@ -155,25 +155,63 @@
     return typeof c === 'string' && /^[a-z0-9-]{2,40}$/.test(c) ? c : '';
   }
 
-  /* Renvoie le nombre affiché par GoatCounter, '0' si rien n'est encore compté, ou null si illisible. */
+  /* Renvoie le nombre brut compté par GoatCounter (0 si rien n'est encore compté), ou null si illisible. */
   let diagnostic = '';
   async function lireCompteur(chemin) {
     const code = codeCompteur();
     if (!code) return null;
     try {
       const r = await fetch(`https://${code}.goatcounter.com/counter/${encodeURIComponent(chemin)}.json`, { cache: 'no-store' });
-      if (r.status === 404) return '0';
+      if (r.status === 404) return 0;
       if (!r.ok) { diagnostic = `GoatCounter a répondu « erreur ${r.status} ».`; return null; }
       const d = await r.json();
-      return String(d.count).replace(/\s/g, '\u202f');
+      return parseInt(String(d.count).replace(/\D/g, ''), 10) || 0;
     } catch (e) { diagnostic = 'Le navigateur n\'a pas pu lire GoatCounter (réglage « Allow adding visitor counts… » désactivé, ou bloqueur de publicités actif sur cette page).'; return null; }
   }
 
+  /* Un « reset » ne peut pas effacer les chiffres de GoatCounter : on note le total au moment du reset
+     (data/site.json, clé compteurBase) et on affiche la différence. */
+  function affiche(chemin) {
+    const brut = bruts[chemin];
+    if (brut === undefined) return undefined;
+    if (brut === null) return null;
+    const base = Number((site.compteurBase || {})[chemin]) || 0;
+    return Math.max(0, brut - base);
+  }
+
+  const nombre = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
+
   function texteVues(id) {
     if (!codeCompteur()) return '';
-    const v = comptes[id];
+    const v = affiche('/couteau/' + id);
     if (v === undefined) return '…';
-    return v === null ? 'n/d' : `${v} ${v === '1' ? 'vue' : 'vues'}`;
+    return v === null ? 'n/d' : `${nombre(v)} ${v === 1 ? 'vue' : 'vues'}`;
+  }
+
+  async function remettreAZero(chemin, libelle) {
+    if (!window.confirm(`Remettre à 0 le compteur de ${libelle} ?`)) return;
+    const zone = $('#statut-global');
+    dire(zone, 'Remise à zéro…');
+    try {
+      const brut = await lireCompteur(chemin);
+      if (brut === null) throw new Error('Impossible de lire le compteur pour le moment. ' + diagnostic);
+      site = await modifierJSON(FICHIER_SITE, {}, (d) => {
+        d.compteurBase = (d.compteurBase && typeof d.compteurBase === 'object') ? d.compteurBase : {};
+        d.compteurBase[chemin] = brut;
+        return d;
+      }, `Compteur remis à 0 : ${libelle}`);
+      bruts[chemin] = brut;
+      afficherCompteurs();
+      dire(zone, 'Compteur remis à 0.');
+    } catch (e) {
+      dire(zone, e.message, true);
+    }
+  }
+
+  function afficherCompteurs() {
+    const t = affiche('/visite');
+    $('#stat-total').textContent = t === undefined ? '…' : (t === null ? 'n/d' : nombre(t));
+    document.querySelectorAll('.vues').forEach((n) => { n.textContent = texteVues(n.dataset.id); });
   }
 
   async function majCompteurs() {
@@ -189,13 +227,13 @@
       lireCompteur('/visite'),
       ...couteaux.map((c) => lireCompteur('/couteau/' + c.id)),
     ]);
-    total.textContent = t === null ? 'n/d' : t;
-    couteaux.forEach((c, i) => { comptes[c.id] = autres[i]; });
-    document.querySelectorAll('.vues').forEach((n) => { n.textContent = texteVues(n.dataset.id); });
+    bruts['/visite'] = t;
+    couteaux.forEach((c, i) => { bruts['/couteau/' + c.id] = autres[i]; });
+    afficherCompteurs();
     if (t === null) {
       note.textContent = `Compteur illisible. ${diagnostic} Vérifiez le code « ${codeCompteur()} » (c'est le début de l'adresse de votre GoatCounter) et, dans GoatCounter > Settings, l'option « Allow adding visitor counts on your website ».`;
     } else {
-      note.textContent = 'Visites depuis le début. Vos propres visites, faites depuis un appareil où vous vous êtes connecté ici, ne sont pas comptées. Les visiteurs qui bloquent les traceurs ne le sont pas non plus : ce sont donc des chiffres minimaux.';
+      note.textContent = 'Visites depuis le dernier reset (ou depuis le début). Vos propres visites, faites depuis un appareil où vous vous êtes connecté ici, ne sont pas comptées. Les visiteurs qui bloquent les traceurs ne le sont pas non plus : ce sont donc des chiffres minimaux.';
     }
   }
 
@@ -406,9 +444,11 @@
       boutons.append(modifier, basculer, suppr);
 
       const vues = el('span', { class: 'vues', 'data-id': c.id || '', text: texteVues(c.id) });
+      const raz = el('button', { type: 'button', class: 'raz', text: '↺', title: 'Remettre le compteur à 0', 'aria-label': `Remettre à 0 le compteur de ${c.nom || 'ce couteau'}` });
+      raz.addEventListener('click', () => remettreAZero('/couteau/' + c.id, `« ${c.nom || 'ce couteau'} »`));
       ul.append(el('li', { 'data-cle': c.id || '' },
         couteaux.length > 1 ? el('button', { type: 'button', class: 'poignee', text: '⠿ Glisser', title: 'Glisser pour changer l\'ordre (ou flèches du clavier)' }) : null,
-        el('div', { class: 'vignette-col' }, vignette, vues),
+        el('div', { class: 'vignette-col' }, vignette, el('span', { class: 'vues-ligne' }, vues, raz)),
         el('div', null,
           el('div', { class: 'nom-ligne', text: c.nom || 'Sans nom' }),
           el('div', { class: 'meta', text: `${LIBELLES[c.statut] || 'Disponible'} · ${prixTexte(c.prix)}` }),
@@ -643,6 +683,7 @@
     $('#o-textes').addEventListener('click', () => choisirOnglet('textes'));
     $('#atelier-fichiers').addEventListener('change', (e) => ajouterAtelier(Array.from(e.target.files)));
     $('#ajouter').addEventListener('click', () => ouvrirEditeur(null));
+    $('#raz-total').addEventListener('click', () => remettreAZero('/visite', 'le site'));
     $('#annuler').addEventListener('click', () => $('#editeur').close());
     $('#photos-fichiers').addEventListener('change', (e) => ajouterFichiers(Array.from(e.target.files)));
     $('#f-couteau').addEventListener('submit', enregistrerCouteau);
