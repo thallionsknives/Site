@@ -1,6 +1,23 @@
 {
   "couteaux": [
     {
+      "id": "l-ocean-mvgeyl4y",
+      "nom": "L'Océan",
+      "prix": 50,
+      "statut": "disponible",
+      "longueur": "12.5 cm",
+      "lame": "Acier inoxydable, 5 cm",
+      "manche": "Frêne",
+      "lienAchat": "",
+      "description": "Couteau à huitre\n- Manche ergonomique en frêne stabilisé\n- lame inoxydable: X50CrMoV15",
+      "photos": [
+        "images/couteaux/l-ocean-mvgeyl4y-mvgeylbw0.webp",
+        "images/couteaux/l-ocean-mvgeyl4y-mvgeymzh1.webp",
+        "images/couteaux/l-ocean-mvgeyl4y-mvgeyom02.webp"
+      ],
+      "date": "2026-10-20"
+    },
+    {
       "id": "sommelier-mv19vjdn",
       "nom": "Sommelier",
       "prix": 150,
