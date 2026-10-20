@@ -15,9 +15,8 @@
   let couteaux = [];
   let site = {};
   let enEdition = null;
-  let existantes = [];
+  let lot = []; // photos de la fiche en cours, dans l'ordre : { chemin } (déjà en ligne) ou { file, url } (à envoyer)
   let aRetirer = [];
-  let nouvelles = [];
   let bruts = {};
 
   /* ---------- Utilitaires ---------- */
@@ -495,10 +494,9 @@
 
   function ouvrirEditeur(c) {
     enEdition = c || null;
-    existantes = c ? [...(c.photos || [])] : [];
+    lot.forEach((n) => { if (n.url) URL.revokeObjectURL(n.url); });
+    lot = c ? (c.photos || []).map((p) => ({ chemin: p })) : [];
     aRetirer = [];
-    nouvelles.forEach((n) => URL.revokeObjectURL(n.url));
-    nouvelles = [];
     const f = $('#f-couteau');
     f.reset();
     $('#editeur-titre').textContent = c ? 'Modifier le couteau' : 'Ajouter un couteau';
@@ -521,34 +519,36 @@
   function afficherPhotos() {
     const ul = $('#photos-liste');
     ul.replaceChildren();
-    existantes.forEach((p, i) => {
+    lot.forEach((n, i) => {
+      const retirer = el('button', { type: 'button', text: 'Retirer' });
+      retirer.addEventListener('click', () => {
+        lot.splice(i, 1);
+        if (n.url) URL.revokeObjectURL(n.url); else aRetirer.push(n.chemin);
+        afficherPhotos();
+      });
       const rangee = el('div', { class: 'rangee' });
-      if (i > 0) {
-        const premier = el('button', { type: 'button', text: 'En premier' });
-        premier.addEventListener('click', () => { existantes.splice(i, 1); existantes.unshift(p); afficherPhotos(); });
-        rangee.append(premier);
-      }
-      const retirer = el('button', { type: 'button', text: 'Retirer' });
-      retirer.addEventListener('click', () => { existantes.splice(i, 1); aRetirer.push(p); afficherPhotos(); });
+      if (lot.length > 1) rangee.append(el('button', { type: 'button', class: 'poignee', text: '⠿ Glisser', title: 'Glisser pour changer l\'ordre (ou flèches du clavier)' }));
       rangee.append(retirer);
-      ul.append(el('li', null, el('img', { src: p, alt: `Photo ${i + 1}` }), rangee));
+      ul.append(el('li', { 'data-cle': String(n.id || (n.id = Math.random().toString(36).slice(2))) },
+        el('img', { src: n.url || n.chemin, alt: `Photo ${i + 1}` }),
+        el('span', { class: 'rang', text: i === 0 ? '1 · photo principale' : String(i + 1) }),
+        rangee));
     });
-    nouvelles.forEach((n, i) => {
-      const retirer = el('button', { type: 'button', text: 'Retirer' });
-      retirer.addEventListener('click', () => { URL.revokeObjectURL(n.url); nouvelles.splice(i, 1); afficherPhotos(); });
-      ul.append(el('li', null, el('img', { src: n.url, alt: `Nouvelle photo ${i + 1}` }), el('div', { class: 'rangee' }, retirer)));
+    activerTri(ul, (ordre) => {
+      lot = ordre.map((k) => lot.find((n) => n.id === k)).filter(Boolean);
+      afficherPhotos();
     });
   }
 
   function ajouterFichiers(liste) {
     const msg = $('#msg-editeur');
     for (const fichier of liste) {
-      if (existantes.length + nouvelles.length >= MAX_PHOTOS) {
+      if (lot.length >= MAX_PHOTOS) {
         dire(msg, `${MAX_PHOTOS} photos au maximum par couteau : retirez-en une pour en ajouter une autre.`, true);
         break;
       }
       if (!fichier.type.startsWith('image/')) continue;
-      nouvelles.push({ file: fichier, url: URL.createObjectURL(fichier) });
+      lot.push({ file: fichier, url: URL.createObjectURL(fichier) });
     }
     $('#photos-fichiers').value = '';
     afficherPhotos();
@@ -561,7 +561,7 @@
     const nom = f.elements.nom.value.trim();
     if (!nom) { dire(msg, 'Indiquez le nom du couteau.', true); return; }
 
-    if (existantes.length + nouvelles.length < 1) { dire(msg, 'Ajoutez au moins une photo (jusqu\'à 3).', true); return; }
+    if (lot.length < 1) { dire(msg, 'Ajoutez au moins une photo (jusqu\'à 3).', true); return; }
 
     const prixBrut = parseFloat(f.elements.prix.value.replace(',', '.'));
     const lien = f.elements.lien.value.trim();
@@ -569,14 +569,19 @@
 
     $('#enregistrer').disabled = true;
     const id = enEdition ? enEdition.id : `${slug(nom)}-${Date.now().toString(36)}`;
-    const photos = [...existantes];
+    const photos = [];
     try {
-      for (let i = 0; i < nouvelles.length; i++) {
-        dire(msg, `Envoi de la photo ${i + 1} sur ${nouvelles.length}…`);
-        const { b64, ext } = await preparerImage(nouvelles[i].file);
-        const chemin = `images/couteaux/${id}-${Date.now().toString(36)}${i}.${ext}`;
+      const aEnvoyer = lot.filter((n) => n.file).length;
+      let envoyees = 0;
+      for (const n of lot) {
+        if (!n.file) { photos.push(n.chemin); continue; }
+        envoyees++;
+        dire(msg, `Envoi de la photo ${envoyees} sur ${aEnvoyer}…`);
+        const { b64, ext } = await preparerImage(n.file);
+        const chemin = `images/couteaux/${id}-${Date.now().toString(36)}${envoyees}.${ext}`;
         await ecrire(chemin, b64, `Photo : ${nom}`);
         photos.push(chemin);
+        n.chemin = chemin; n.url = null; n.file = null;
       }
       dire(msg, 'Enregistrement de la fiche…');
       const fiche = {
@@ -601,8 +606,8 @@
       for (const p of aRetirer) {
         try { await supprimerFichier(p); } catch (err) { /* photo déjà absente */ }
       }
-      nouvelles.forEach((n) => URL.revokeObjectURL(n.url));
-      nouvelles = [];
+      lot.forEach((n) => { if (n.url) URL.revokeObjectURL(n.url); });
+      lot = [];
       $('#editeur').close();
       await rafraichir();
       majCompteurs();

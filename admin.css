@@ -97,3 +97,5 @@ body.adm { padding-top: 0; }
 .raz { font: 500 .95rem var(--sans); line-height: 1; padding: .25em .45em; border: 1px solid var(--lame); background: var(--blanc); color: var(--gris); border-radius: 2px; cursor: pointer; }
 .raz:hover { color: var(--encre); border-color: var(--gris); }
 .vues-ligne { display: inline-flex; align-items: center; gap: 6px; }
+.photos-liste li { position: relative; }
+.photos-liste .rang { font-size: .75rem; color: var(--gris); }

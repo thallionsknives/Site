@@ -225,8 +225,12 @@ dialog::backdrop { background: rgba(21, 26, 29, .6); }
 .js .reveal.visible { opacity: 1; transform: none; }
 
 /* Galerie de l'atelier : autant de photos que l'on veut, chacune dans sa proportion */
-.atelier-galerie { columns: 3 260px; column-gap: 16px; margin-top: clamp(28px, 4vw, 48px); }
-.atelier-photo { display: block; width: 100%; margin: 0 0 16px; padding: 0; border: 0; background: none; cursor: zoom-in; break-inside: avoid; }
+.atelier-galerie { display: flex; flex-wrap: wrap; gap: 16px; margin-top: clamp(28px, 4vw, 48px); }
+.atelier-galerie::after { content: ''; flex-grow: 1000; }
+/* Rangées justifiées : ordre chronologique de gauche à droite, puis rangée suivante.
+   --r = largeur / hauteur de la photo (renseigné au chargement). */
+.atelier-photo { --r: 1.33; display: block; flex: var(--r) 1 calc(var(--r) * 230px); min-width: 0; margin: 0; padding: 0; border: 0; background: none; cursor: zoom-in; }
+@media (max-width: 640px) { .atelier-photo { flex: 1 1 100%; } }
 .atelier-photo img { display: block; width: 100%; height: auto; border-radius: 2px; transition: opacity .3s ease; }
 .atelier-photo:hover img { opacity: .88; }
 

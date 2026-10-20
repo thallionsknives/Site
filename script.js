@@ -255,8 +255,11 @@
     zone.replaceChildren();
     zone.hidden = photosAtelier.length === 0;
     photosAtelier.forEach((p, i) => {
-      const b = el('button', { type: 'button', class: 'atelier-photo reveal', 'aria-label': `Agrandir la photo ${i + 1} de l'atelier` },
-        el('img', { src: p, alt: `Photo ${i + 1} de l'atelier`, loading: 'lazy', decoding: 'async' }));
+      const img = el('img', { src: p, alt: `Photo ${i + 1} de l'atelier`, loading: 'lazy', decoding: 'async' });
+      const b = el('button', { type: 'button', class: 'atelier-photo reveal', 'aria-label': `Agrandir la photo ${i + 1} de l'atelier` }, img);
+      const ratio = () => { if (img.naturalWidth && img.naturalHeight) b.style.setProperty('--r', (img.naturalWidth / img.naturalHeight).toFixed(3)); };
+      img.addEventListener('load', ratio);
+      if (img.complete) ratio();
       b.addEventListener('click', () => ouvrirZoom(i, b));
       zone.append(b);
       surveiller(b);
