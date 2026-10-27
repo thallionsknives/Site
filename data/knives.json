@@ -1,6 +1,22 @@
 {
   "couteaux": [
     {
+      "id": "le-mignon-mvqrvyju",
+      "nom": "Le Mignon",
+      "prix": 70,
+      "statut": "disponible",
+      "longueur": "16",
+      "lame": "Acier inoxydable, 8.5 cm, 2mm d'épaisseur",
+      "manche": "chêne stabilisé",
+      "lienAchat": "",
+      "description": "Petit couteau pratique en acier inoxydable (X50CrMoV15) de 2mm d'épaisseur. Cette finesse de lame la rend souple souple mais toutefois résiliente.",
+      "photos": [
+        "images/couteaux/le-mignon-mvqrvyju-mvqrvyrh1.webp",
+        "images/couteaux/le-mignon-mvqrvyju-mvqrw0q12.webp"
+      ],
+      "date": "2026-10-27"
+    },
+    {
       "id": "l-ocean-mvgeyl4y",
       "nom": "L'Océan",
       "prix": 55,
