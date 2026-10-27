@@ -357,10 +357,10 @@
         await ecrire(chemin, b64, 'Atelier : nouvelle photo');
         ajoutes.push(chemin);
       }
-      await sauverAtelier((l) => l.concat(ajoutes), `Atelier : ${ajoutes.length} photo(s) ajoutée(s)`);
+      await sauverAtelier((l) => ajoutes.concat(l), `Atelier : ${ajoutes.length} photo(s) ajoutée(s)`);
       dire(zone, 'Enregistré. Les photos apparaissent sur le site dans environ une minute.');
     } catch (e) {
-      if (ajoutes.length) { try { await sauverAtelier((l) => l.concat(ajoutes), 'Atelier : photos ajoutées'); } catch (e2) { /* rien */ } }
+      if (ajoutes.length) { try { await sauverAtelier((l) => ajoutes.concat(l), 'Atelier : photos ajoutées'); } catch (e2) { /* rien */ } }
       dire(zone, e.message, true);
     }
   }
