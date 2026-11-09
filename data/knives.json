@@ -129,7 +129,7 @@
     {
       "id": "exemple-vendu",
       "nom": "Le Sobre",
-      "prix": 90,
+      "prix": 80,
       "statut": "disponible",
       "longueur": "20 cm ouvert",
       "lame": "Acier au carbone, 7 cm",
