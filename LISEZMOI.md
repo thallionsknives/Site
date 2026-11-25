@@ -49,7 +49,7 @@ Quand vous voudrez encaisser :
 
 1. Créez un compte **Stripe** et, pour chaque couteau, un **Payment Link** (lien de paiement). Stripe vous envoie un e-mail à chaque achat.
 2. Dans l'espace privé, ouvrez la fiche du couteau et collez le lien dans « Lien de paiement ». Le bouton « Demander ce couteau » devient « Acheter ce couteau ».
-3. Les couteaux étant des pièces uniques, marquez-le « Vendu » dès qu'il est acheté (bouton dans la liste).
+3. Chaque couteau a un statut : « Disponible » ou « Sur commande » (bouton dans la liste pour passer de l'un à l'autre).
 
 Avant de vendre : complétez les mentions légales (onglet « Textes du site ») et renseignez-vous sur les obligations d'un vendeur en ligne (statut, droit de rétractation de 14 jours, conditions générales de vente). Je ne suis pas juriste : en cas de doute, voyez un professionnel ou votre CCI.
 
@@ -83,3 +83,10 @@ Vos propres visites ne sont pas comptées sur les appareils où vous vous êtes 
 ## 9. Retirer « Site en construction »
 
 Dans `index.html`, supprimez la ligne `<p class="en-construction"><span>Site en construction</span></p>` (vous pouvez le faire directement sur GitHub : ouvrez `index.html`, cliquez sur le crayon, supprimez la ligne, puis « Commit changes »).
+
+## 10. Statut, mail, personnalisation
+
+- **Statut** : chaque couteau est soit « Disponible », soit « Sur commande » (menu dans la fiche, ou bouton dans la liste). Les filtres du site suivent ces deux statuts.
+- **Prix** : laissez le champ vide, et rien ne s'affiche sur le site.
+- **Mail par couteau** : chaque couteau a un lien « Écrire à propos de ce couteau » (sous la vignette et dans la fiche). Il ouvre la messagerie du visiteur avec le nom du couteau déjà dans l'objet. L'adresse est celle de « Textes du site ».
+- **Personnalisation** : onglet « Personnalisation » de la page privée. Ajoutez une photo et un petit titre (« Les rivets », « Le guillochage »…) ; vous pouvez ensuite changer le titre, déplacer ou retirer. La phrase sous « La collection » et le texte de la partie Personnalisation se modifient dans « Textes du site ».

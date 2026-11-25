@@ -57,6 +57,7 @@
 
     <div class="onglets" role="tablist" aria-label="Sections">
       <button type="button" role="tab" id="o-couteaux" aria-selected="true" aria-controls="p-couteaux">Couteaux</button>
+      <button type="button" role="tab" id="o-perso" aria-selected="false" aria-controls="p-perso">Personnalisation</button>
       <button type="button" role="tab" id="o-atelier" aria-selected="false" aria-controls="p-atelier">Photos de l'atelier</button>
       <button type="button" role="tab" id="o-textes" aria-selected="false" aria-controls="p-textes">Textes du site</button>
     </div>
@@ -68,6 +69,21 @@
       </div>
       <p class="aide">Les changements apparaissent sur le site au bout d'une minute environ.</p>
       <ul id="liste" class="liste"></ul>
+    </div>
+
+    <div id="p-perso" role="tabpanel" aria-labelledby="o-perso" hidden>
+      <h2>Personnalisation</h2>
+      <p class="aide">Chaque élément est une photo avec un petit titre (par exemple « Les rivets », « Le guillochage »). Ils s'affichent sur le site dans la partie « Personnalisation », entre la collection et l'atelier. Vous pouvez modifier un titre, déplacer un élément ou le retirer ; chaque changement est enregistré tout de suite.</p>
+      <form id="f-perso" class="formulaire">
+        <label>Titre
+          <input name="titre" required maxlength="60" placeholder="Les rivets">
+        </label>
+        <label class="fichier">Photo
+          <input id="perso-fichier" name="photo" type="file" accept="image/*" required>
+        </label>
+        <p><button type="submit" class="bouton" id="perso-ajouter">Ajouter</button></p>
+      </form>
+      <ul id="perso-liste" class="photos-liste atelier-liste perso-liste"></ul>
     </div>
 
     <div id="p-atelier" role="tabpanel" aria-labelledby="o-atelier" hidden>
@@ -87,6 +103,12 @@
         </label>
         <label>Texte sous la phrase d'accueil
           <textarea name="intro" rows="3"></textarea>
+        </label>
+        <label>Phrase sous « La collection »
+          <textarea name="collection" rows="2"></textarea>
+        </label>
+        <label>Texte de la partie « Personnalisation »
+          <textarea name="personnalisationTexte" rows="3"></textarea>
         </label>
         <label>Texte de l'atelier
           <textarea name="atelier" rows="5"></textarea>
@@ -133,14 +155,13 @@
       <input name="nom" required maxlength="80">
     </label>
     <div class="deux">
-      <label>Prix en euros
-        <input name="prix" inputmode="decimal" placeholder="180">
+      <label>Prix en euros (facultatif)
+        <input name="prix" inputmode="decimal" placeholder="Laissez vide : aucun prix affiché">
       </label>
       <label>Statut
         <select name="statut">
           <option value="disponible">Disponible</option>
-          <option value="reserve">Réservé</option>
-          <option value="vendu">Vendu</option>
+          <option value="commande">Sur commande</option>
         </select>
       </label>
     </div>

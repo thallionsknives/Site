@@ -13,7 +13,7 @@
   const CHEMIN_OK = /^images\/[A-Za-z0-9_\-./]+$/;
   const EMAIL_OK = /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/;
   const LIEN_OK = /^https:\/\/[^\s"'<>]+$/;
-  const STATUTS = { disponible: 'Disponible', reserve: 'Réservé', vendu: 'Vendu' };
+  const STATUTS = { disponible: 'Disponible', commande: 'Sur commande' };
 
   let site = {};
   let couteaux = [];
@@ -85,8 +85,9 @@
     return n;
   }
 
+  // Sans prix renseigné, rien n'est affiché
   function prixTexte(p) {
-    if (typeof p !== 'number' || !(p > 0)) return 'Prix sur demande';
+    if (typeof p !== 'number' || !(p > 0)) return '';
     return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 }).format(p);
   }
 
@@ -108,19 +109,30 @@
     const email = site.email;
     if (!EMAIL_OK.test(email || '')) return '#contact';
     const sujet = c ? `Couteau : ${c.nom}` : 'Demande de renseignements';
-    const corps = c
-      ? `Bonjour,\n\nLe couteau « ${c.nom} » m'intéresse. Pouvez-vous me donner les modalités de paiement et d'envoi ?\n\nMerci.`
-      : 'Bonjour,\n\n';
+    let corps = 'Bonjour,\n\n';
+    if (c && statutDe(c) === 'commande') {
+      corps = `Bonjour,\n\nLe couteau « ${c.nom} » m'intéresse. Je souhaiterais le commander : pouvez-vous me donner les délais, le prix et les modalités de paiement et d'envoi ?\n\nMerci.`;
+    } else if (c) {
+      corps = `Bonjour,\n\nLe couteau « ${c.nom} » m'intéresse. Pouvez-vous me donner les modalités de paiement et d'envoi ?\n\nMerci.`;
+    }
     return `mailto:${email}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
+  }
+
+  // Petite enveloppe, dessin fixe (aucune donnée du site n'y entre)
+  function iconeMail() {
+    const n = el('span', { class: 'icone-mail', 'aria-hidden': 'true' });
+    n.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>';
+    return n;
   }
 
   function carte(c) {
     const photos = (c.photos || []).filter((p) => CHEMIN_OK.test(p));
     const st = statutDe(c);
+    const prix = prixTexte(c.prix);
     const vignette = el('figure', { class: 'vignette' });
     if (photos.length) {
       vignette.append(el('img', { src: photos[0], alt: `Couteau ${c.nom || ''} fait main`.trim(), loading: 'lazy', decoding: 'async' }));
-      if (photos.length > 1 && st !== 'vendu') {
+      if (photos.length > 1) {
         vignette.append(el('img', { class: 'seconde', src: photos[1], alt: '', loading: 'lazy', decoding: 'async' }));
       }
     } else {
@@ -128,15 +140,18 @@
     }
     const bouton = el(
       'button',
-      { type: 'button', class: 'carte' + (st === 'vendu' ? ' carte-vendu' : '') },
+      { type: 'button', class: 'carte' },
       vignette,
       el('div', { class: 'legende' },
         el('span', { class: 'nom', text: c.nom || 'Sans nom' }),
-        el('span', { class: 'prix', text: st === 'vendu' ? '' : prixTexte(c.prix) })),
+        prix ? el('span', { class: 'prix', text: prix }) : null),
       el('div', { class: 'statut statut-' + st, text: STATUTS[st] })
     );
     bouton.addEventListener('click', () => ouvrirFiche(c, bouton));
-    return bouton;
+    // Lien « mail » propre à chaque couteau : ouvre la messagerie avec le nom du couteau déjà indiqué
+    const mail = el('a', { class: 'carte-mail', href: adresseContact(c), 'aria-label': `Écrire à propos du couteau ${c.nom || ''}`.trim() },
+      iconeMail(), el('span', { text: 'Écrire à propos de ce couteau' }));
+    return el('div', { class: 'carte-bloc' }, bouton, mail);
   }
 
   // Données structurées (SEO) : un « Product » par couteau
@@ -149,7 +164,7 @@
       const p = { '@type': 'Product', name: c.nom, image: new URL(c.photos[0], base).href, brand: { '@type': 'Brand', name: 'Les couteaux de Thallions' } };
       if (c.description) p.description = c.description;
       if (c.manche) p.material = c.manche;
-      if (c.prix) p.offers = { '@type': 'Offer', price: String(c.prix), priceCurrency: 'EUR', availability: st === 'disponible' ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut', url: base + '#collection' };
+      if (c.prix) p.offers = { '@type': 'Offer', price: String(c.prix), priceCurrency: 'EUR', availability: st === 'disponible' ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder', url: base + '#collection' };
       return p;
     });
     n.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': items });
@@ -158,7 +173,7 @@
   function rendre() {
     const grille = $('#grille');
     grille.replaceChildren();
-    const liste = couteaux.filter((c) => filtre === 'tous' || statutDe(c) === 'disponible');
+    const liste = couteaux.filter((c) => filtre === 'tous' || statutDe(c) === filtre);
     liste.forEach((c, i) => {
       const b = carte(c);
       b.classList.add('reveal');
@@ -169,9 +184,13 @@
     $('#vide').hidden = liste.length > 0;
     donneesStructurees();
     const dispo = couteaux.filter((c) => statutDe(c) === 'disponible').length;
-    $('#compte').textContent = couteaux.length
-      ? `${dispo} disponible${dispo > 1 ? 's' : ''} sur ${couteaux.length}`
-      : '';
+    const commande = couteaux.length - dispo;
+    let compte = '';
+    if (couteaux.length) {
+      compte = `${dispo} disponible${dispo > 1 ? 's' : ''}`;
+      if (commande) compte += ` · ${commande} sur commande`;
+    }
+    $('#compte').textContent = compte;
   }
 
   function ouvrirFiche(c, declencheur) {
@@ -213,9 +232,10 @@
       galerie.append(minis);
     }
 
+    const prix = prixTexte(c.prix);
     const infos = el('div', { class: 'infos' },
       el('h2', { id: 'fiche-titre', text: c.nom || 'Sans nom' }),
-      el('p', { class: 'prix-grand', text: st === 'vendu' ? '' : prixTexte(c.prix) }),
+      prix ? el('p', { class: 'prix-grand', text: prix }) : null,
       el('div', { class: 'statut statut-' + st, text: STATUTS[st] })
     );
 
@@ -228,14 +248,15 @@
     }
     if (c.description) infos.append(el('p', { class: 'description', text: c.description }));
 
-    if (st === 'vendu') {
-      infos.append(el('p', { class: 'description', text: 'Ce couteau a trouvé preneur. Écrivez-moi si vous souhaitez un modèle comparable.' }));
-      infos.append(el('a', { class: 'bouton', href: adresseContact(null), text: 'Écrire à l\'atelier' }));
-    } else if (LIEN_OK.test(c.lienAchat || '')) {
-      infos.append(el('a', { class: 'bouton', href: c.lienAchat, target: '_blank', rel: 'noopener noreferrer', text: 'Acheter ce couteau' }));
-    } else {
-      infos.append(el('a', { class: 'bouton', href: adresseContact(c), text: 'Demander ce couteau' }));
+    // Toujours un bouton mail propre au couteau ; le lien de paiement, s'il existe, s'ajoute à côté
+    const actions = el('div', { class: 'fiche-actions' });
+    const aLien = LIEN_OK.test(c.lienAchat || '');
+    if (aLien) {
+      actions.append(el('a', { class: 'bouton', href: c.lienAchat, target: '_blank', rel: 'noopener noreferrer', text: 'Acheter ce couteau' }));
     }
+    const mail = el('a', { class: 'bouton' + (aLien ? ' secondaire' : ''), href: adresseContact(c) }, iconeMail(), el('span', { text: 'Écrire à propos de ce couteau' }));
+    actions.append(mail);
+    infos.append(actions);
 
     corps.append(galerie, infos);
     dlg._retour = declencheur;
@@ -261,6 +282,27 @@
       img.addEventListener('load', ratio);
       if (img.complete) ratio();
       b.addEventListener('click', () => ouvrirZoom(i, b));
+      zone.append(b);
+      surveiller(b);
+    });
+  }
+
+  /* Personnalisation : liste « personnalisation » de data/site.json, chaque élément = un titre + une photo */
+  function afficherPerso() {
+    const zone = $('#perso-grille');
+    const items = (Array.isArray(site.personnalisation) ? site.personnalisation : [])
+      .filter((x) => x && typeof x.photo === 'string' && CHEMIN_OK.test(x.photo));
+    zone.replaceChildren();
+    zone.hidden = items.length === 0;
+    const photos = items.map((x) => x.photo);
+    const nom = (x, i) => (typeof x.titre === 'string' && x.titre.trim()) || `Personnalisation ${i + 1}`;
+    items.forEach((x, i) => {
+      const t = nom(x, i);
+      const b = el('button', { type: 'button', class: 'perso-item reveal', 'aria-label': `Agrandir la photo : ${t}` },
+        el('img', { src: x.photo, alt: t, loading: 'lazy', decoding: 'async' }),
+        el('span', { class: 'perso-titre', text: t }));
+      b.style.setProperty('--d', `${(i % 3) * 110}ms`);
+      b.addEventListener('click', () => ouvrirZoom(i, b, photos, (k) => nom(items[k], k)));
       zone.append(b);
       surveiller(b);
     });
@@ -313,6 +355,8 @@
     remplir('#accroche', site.accroche);
     remplir('#intro', site.intro);
     remplir('#atelier-texte', site.atelier);
+    remplir('#collection-texte', site.collection);
+    remplir('#perso-texte', site.personnalisationTexte);
     if (site.nom) document.title = site.nom;
     $('#contact-lien').setAttribute('href', adresseContact(null));
 
@@ -391,6 +435,7 @@
     appliquerSite();
     afficherPhotoAccueil();
     afficherAtelier();
+    afficherPerso();
     compter('/visite', 'Visite du site');
 
     try {

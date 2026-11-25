@@ -44,6 +44,7 @@
     <nav aria-label="Navigation principale">
       <ul class="menu">
         <li><a href="#collection">Collection</a></li>
+        <li><a href="#personnalisation">Personnalisation</a></li>
         <li><a href="#atelier">L'atelier</a></li>
         <li><a href="#contact">Contact</a></li>
         <li>
@@ -85,15 +86,25 @@
       <div class="bloc-tete reveal">
         <div>
           <h2 id="titre-collection">La collection</h2>
+          <p class="texte-collection" id="collection-texte">Tous les modèles présentés peuvent être refaits sur commande : écrivez-moi pour en parler.</p>
           <p class="compte" id="compte"></p>
         </div>
         <div class="filtres" role="group" aria-label="Filtrer la collection">
           <button type="button" class="filtre" data-filtre="tous" aria-pressed="true">Tous</button>
           <button type="button" class="filtre" data-filtre="disponible" aria-pressed="false">Disponibles</button>
+          <button type="button" class="filtre" data-filtre="commande" aria-pressed="false">Sur commande</button>
         </div>
       </div>
       <div id="grille" class="grille" aria-live="polite"></div>
-      <p id="vide" class="vide" hidden>Aucun couteau disponible pour le moment. Écrivez-moi pour être prévenu du prochain.</p>
+      <p id="vide" class="vide" hidden>Aucun couteau dans cette catégorie pour le moment. Écrivez-moi pour être prévenu du prochain.</p>
+    </div>
+  </section>
+
+  <section id="personnalisation" class="bloc fond-perso" aria-labelledby="titre-perso">
+    <div class="conteneur">
+      <h2 class="reveal" id="titre-perso">Personnalisation</h2>
+      <p class="texte-long reveal" id="perso-texte">Le manche, la lame, les rivets, la finition : chaque détail peut être adapté à vos envies. Voici quelques exemples.</p>
+      <div class="perso-grille" id="perso-grille" hidden></div>
     </div>
   </section>
 

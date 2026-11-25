@@ -130,6 +130,7 @@ h1 {
 /* Fonds : une teinte par grande partie, sobres mais bien contrastées */
 .fond-collection { background: #E4EAEC; }
 .fond-collection .filtre { border-color: #AAB5BA; }
+.fond-perso { background: #F3EEE3; }
 .fond-atelier { background: var(--acier); color: #DDE3E5; }
 .fond-atelier h2 { color: #fff; }
 .fond-contact { background: #EAE2D0; }
@@ -148,6 +149,7 @@ h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.9rem, 3.6vw
 .bloc-tete { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: clamp(28px, 4vw, 48px); }
 .bloc-tete h2 { margin-bottom: .15em; }
 .compte { margin: 0; color: var(--gris); font-size: .95rem; }
+.texte-collection { max-width: 56ch; margin: 0 0 .6em; color: var(--acier); }
 
 .filtres { display: flex; gap: 6px; }
 .filtre {
@@ -164,7 +166,6 @@ h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.9rem, 3.6vw
 .vignette { margin: 0; background: var(--blanc); border: 1px solid var(--lame); border-radius: 2px; overflow: hidden; }
 .vignette img { display: block; width: 100%; height: auto; transition: transform .5s ease; }
 .carte:hover .vignette img { transform: scale(1.025); }
-.carte-vendu .vignette img, .carte-vendu .sans-photo { filter: grayscale(1); opacity: .55; }
 
 .legende { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 14px; }
 .nom { font-family: var(--serif); font-size: 1.4rem; line-height: 1.2; letter-spacing: -.01em; }
@@ -173,14 +174,18 @@ h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.9rem, 3.6vw
 
 .statut { display: flex; align-items: center; gap: 8px; margin-top: 4px; color: var(--gris); font-size: .92rem; }
 .statut::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--laiton); }
-.statut-vendu::before { background: var(--lame); }
-.statut-reserve::before { background: transparent; border: 1.5px solid var(--laiton); }
+.statut-commande::before { background: transparent; border: 1.5px solid var(--laiton); }
 
 .vignette .sans-photo { aspect-ratio: 4 / 5; }
 .sans-photo { width: 100%; height: 100%; display: grid; place-items: center; background: var(--blanc); }
 .sans-photo svg { width: 100%; height: 100%; }
 
 .vide, .erreur { color: var(--gris); max-width: 52ch; }
+
+/* Lien « mail » sous chaque couteau */
+.carte-mail { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; color: var(--gris); font-size: .92rem; font-weight: 500; text-decoration: none; }
+.carte-mail:hover { color: var(--encre); text-decoration: underline; text-decoration-color: var(--laiton); text-underline-offset: 5px; }
+.icone-mail { display: inline-flex; flex: none; }
 
 /* Fiche détaillée */
 dialog {
@@ -219,6 +224,10 @@ dialog::backdrop { background: rgba(21, 26, 29, .6); }
   text-decoration: none; font-weight: 500; border: 1px solid var(--acier); border-radius: 2px;
 }
 .bouton:hover { background: var(--encre); border-color: var(--encre); }
+.fiche-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.fiche-actions .bouton { display: inline-flex; align-items: center; gap: 10px; }
+.bouton.secondaire { background: transparent; color: var(--encre); border-color: var(--lame); }
+.bouton.secondaire:hover { background: transparent; border-color: var(--gris); }
 
 /* Apparitions douces au défilement : actives seulement quand le script est chargé */
 .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .9s ease, transform .9s cubic-bezier(.2, .7, .2, 1); transition-delay: var(--d, 0ms); }
@@ -233,6 +242,14 @@ dialog::backdrop { background: rgba(21, 26, 29, .6); }
 @media (max-width: 640px) { .atelier-photo { flex: 1 1 100%; } }
 .atelier-photo img { display: block; width: 100%; height: auto; border-radius: 2px; transition: opacity .3s ease; }
 .atelier-photo:hover img { opacity: .88; }
+
+/* Personnalisation : une photo et un petit titre, cliquable pour agrandir */
+.perso-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: clamp(24px, 3vw, 36px) clamp(18px, 2.5vw, 28px); margin-top: clamp(28px, 4vw, 48px); }
+.perso-item { display: block; width: 100%; padding: 0; border: 0; background: none; text-align: left; font: inherit; color: inherit; cursor: zoom-in; }
+.perso-item img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border: 1px solid var(--lame); border-radius: 2px; transition: opacity .3s ease; }
+.perso-item:hover img { opacity: .88; }
+.perso-titre { display: block; margin-top: 12px; font-family: var(--serif); font-size: 1.3rem; line-height: 1.2; letter-spacing: -.01em; }
+.perso-item:hover .perso-titre { text-decoration: underline; text-decoration-color: var(--laiton); text-underline-offset: 5px; text-decoration-thickness: 1px; }
 
 /* Visionneuse : une photo en grand, flèches pour passer à la suivante */
 .dialogue-zoom { width: min(1100px, calc(100% - 24px)); background: var(--encre); padding: 0; }
@@ -302,4 +319,5 @@ dialog::backdrop { background: rgba(21, 26, 29, .6); }
   .lame .laiton { animation: none; opacity: 1; }
   .vignette img, .vignette .seconde { transition: none; }
   .carte:hover .vignette img { transform: none; }
+  .perso-item img { transition: none; }
 }

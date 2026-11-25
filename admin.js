@@ -9,7 +9,8 @@
   const CLE_STOCKAGE = 'thallions-connexion';
   const MAX_PHOTOS = 3;
   const LIEN_OK = /^https:\/\/[^\s"'<>]+$/;
-  const LIBELLES = { disponible: 'Disponible', reserve: 'Réservé', vendu: 'Vendu' };
+  const LIBELLES = { disponible: 'Disponible', commande: 'Sur commande' };
+  const statutDe = (c) => (LIBELLES[c && c.statut] ? c.statut : 'disponible');
 
   let cfg = null;
   let couteaux = [];
@@ -57,7 +58,7 @@
   }
 
   function prixTexte(p) {
-    return typeof p === 'number' && p > 0 ? `${p.toLocaleString('fr-FR')} €` : 'Prix sur demande';
+    return typeof p === 'number' && p > 0 ? `${p.toLocaleString('fr-FR')} €` : '';
   }
 
   /* ---------- API GitHub ---------- */
@@ -365,6 +366,87 @@
     }
   }
 
+  /* ---------- Personnalisation (photo + petit titre) ---------- */
+
+  function listePerso() {
+    return Array.isArray(site.personnalisation) ? site.personnalisation : [];
+  }
+
+  function afficherPerso() {
+    const ul = $('#perso-liste');
+    ul.replaceChildren();
+    const items = listePerso();
+    if (!items.length) {
+      ul.append(el('li', { class: 'vide-liste', text: 'Aucun élément pour le moment.' }));
+      return;
+    }
+    items.forEach((x) => {
+      const img = el('img', { src: x.photo, alt: x.titre || '' });
+      img.addEventListener('error', () => { img.alt = 'En cours de publication…'; });
+      const titre = el('input', { type: 'text', value: x.titre || '', maxlength: '60', 'aria-label': 'Titre de la photo' });
+      titre.addEventListener('change', () => renommerPerso(x.id, titre.value.trim(), titre));
+      const rangee = el('div', { class: 'rangee' });
+      if (items.length > 1) rangee.append(el('button', { type: 'button', class: 'poignee', text: '⠿ Glisser', title: 'Glisser pour déplacer (ou flèches du clavier)' }));
+      const ret = el('button', { type: 'button', text: 'Retirer' });
+      ret.addEventListener('click', () => retirerPerso(x));
+      rangee.append(ret);
+      ul.append(el('li', { 'data-cle': x.id }, img, titre, rangee));
+    });
+    activerTri(ul, (ordre) => reordonnerPerso(ordre));
+  }
+
+  async function sauverPerso(mutateur, message) {
+    site = await modifierJSON(FICHIER_SITE, {}, (d) => { d.personnalisation = mutateur(Array.isArray(d.personnalisation) ? d.personnalisation : []); return d; }, message);
+    afficherPerso();
+  }
+
+  async function renommerPerso(id, titre, champ) {
+    const zone = $('#statut-global');
+    if (!titre) { dire(zone, 'Le titre ne peut pas être vide.', true); const x = listePerso().find((k) => k.id === id); if (x) champ.value = x.titre || ''; return; }
+    dire(zone, 'Enregistrement du titre…');
+    try {
+      await sauverPerso((l) => l.map((x) => (x.id === id ? Object.assign({}, x, { titre }) : x)), 'Personnalisation : titre modifié');
+      dire(zone, 'Enregistré. Le site se met à jour dans environ une minute.');
+    } catch (e) { dire(zone, e.message, true); }
+  }
+
+  function reordonnerPerso(ordre) {
+    return action('Réorganisation', () => sauverPerso((l) => reordonner(l, ordre, (x) => x.id), 'Personnalisation : ordre'));
+  }
+
+  function retirerPerso(x) {
+    if (!window.confirm(`Retirer « ${x.titre || 'cette photo'} » de la personnalisation ?`)) return;
+    return action('Suppression', async () => {
+      await sauverPerso((l) => l.filter((k) => k.id !== x.id), 'Personnalisation : élément retiré');
+      try { await supprimerFichier(x.photo); } catch (e) { /* photo déjà absente */ }
+    });
+  }
+
+  async function ajouterPerso(e) {
+    e.preventDefault();
+    const f = e.target;
+    const zone = $('#statut-global');
+    const titre = f.elements.titre.value.trim();
+    const fichier = f.elements.photo.files[0];
+    if (!titre) { dire(zone, 'Indiquez un titre.', true); return; }
+    if (!fichier || !fichier.type.startsWith('image/')) { dire(zone, 'Choisissez une photo (JPEG ou PNG).', true); return; }
+    const bouton = $('#perso-ajouter');
+    bouton.disabled = true;
+    try {
+      dire(zone, 'Envoi de la photo…');
+      const { b64, ext } = await preparerImage(fichier);
+      const id = `${slug(titre)}-${Date.now().toString(36)}`;
+      const chemin = `images/personnalisation/${id}.${ext}`;
+      await ecrire(chemin, b64, 'Personnalisation : nouvelle photo');
+      await sauverPerso((l) => l.concat({ id, titre, photo: chemin }), `Personnalisation : « ${titre} »`);
+      f.reset();
+      dire(zone, 'Enregistré. Le site se met à jour dans environ une minute.');
+    } catch (err) {
+      dire(zone, err.message, true);
+    }
+    bouton.disabled = false;
+  }
+
   /* ---------- Connexion ---------- */
 
   function stockage() {
@@ -405,6 +487,7 @@
     $('#deco').hidden = false;
     remplirTextes();
     afficherAtelier();
+    afficherPerso();
     majCompteurs();
     dire(msg, '');
   }
@@ -432,13 +515,13 @@
         : el('div', { class: 'mini-photo sans', text: 'Sans photo' });
       if (photo) vignette.addEventListener('error', () => vignette.replaceWith(el('div', { class: 'mini-photo sans', text: 'En cours' })));
 
-      const vendu = c.statut === 'vendu';
+      const surCommande = statutDe(c) === 'commande';
       const boutons = el('div', { class: 'boutons' });
       const modifier = el('button', { type: 'button', class: 'bouton secondaire petit', text: 'Modifier' });
-      const basculer = el('button', { type: 'button', class: 'bouton secondaire petit', text: vendu ? 'Remettre en vente' : 'Marquer vendu' });
+      const basculer = el('button', { type: 'button', class: 'bouton secondaire petit', text: surCommande ? 'Passer en disponible' : 'Passer sur commande' });
       const suppr = el('button', { type: 'button', class: 'bouton danger petit', text: 'Supprimer' });
       modifier.addEventListener('click', () => ouvrirEditeur(c));
-      basculer.addEventListener('click', () => changerStatut(c, vendu ? 'disponible' : 'vendu'));
+      basculer.addEventListener('click', () => changerStatut(c, surCommande ? 'disponible' : 'commande'));
       suppr.addEventListener('click', () => supprimerCouteau(c));
       boutons.append(modifier, basculer, suppr);
 
@@ -450,7 +533,7 @@
         el('div', { class: 'vignette-col' }, vignette, el('span', { class: 'vues-ligne' }, vues, raz)),
         el('div', null,
           el('div', { class: 'nom-ligne', text: c.nom || 'Sans nom' }),
-          el('div', { class: 'meta', text: `${LIBELLES[c.statut] || 'Disponible'} · ${prixTexte(c.prix)}` }),
+          el('div', { class: 'meta', text: [LIBELLES[statutDe(c)], prixTexte(c.prix)].filter(Boolean).join(' · ') }),
           boutons)));
     });
     activerTri(ul, (ordre) => reordonnerCouteaux(ordre));
@@ -503,7 +586,7 @@
     if (c) {
       f.elements.nom.value = c.nom || '';
       f.elements.prix.value = c.prix || '';
-      f.elements.statut.value = c.statut || 'disponible';
+      f.elements.statut.value = statutDe(c);
       f.elements.longueur.value = c.longueur || '';
       f.elements.manche.value = c.manche || '';
       f.elements.lame.value = c.lame || '';
@@ -626,6 +709,8 @@
     f.elements.accroche.value = site.accroche || '';
     f.elements.intro.value = site.intro || '';
     f.elements.atelier.value = site.atelier || '';
+    f.elements.collection.value = site.collection || '';
+    f.elements.personnalisationTexte.value = site.personnalisationTexte || '';
     f.elements.email.value = site.email || '';
     f.elements.compteur.value = site.compteur || '';
     f.elements.m_editeur.value = m.editeur || '';
@@ -648,6 +733,8 @@
         accroche: f.accroche.value.trim(),
         intro: f.intro.value.trim(),
         atelier: f.atelier.value.trim(),
+        collection: f.collection.value.trim(),
+        personnalisationTexte: f.personnalisationTexte.value.trim(),
         email: f.email.value.trim(),
         compteur: code,
         mentions: {
@@ -664,7 +751,7 @@
   /* ---------- Mise en route ---------- */
 
   function choisirOnglet(nom) {
-    ['couteaux', 'atelier', 'textes'].forEach((n) => {
+    ['couteaux', 'perso', 'atelier', 'textes'].forEach((n) => {
       $('#o-' + n).setAttribute('aria-selected', n === nom ? 'true' : 'false');
       $('#p-' + n).hidden = n !== nom;
     });
@@ -684,7 +771,9 @@
 
     $('#deco').addEventListener('click', () => { oublierConnexion(); window.location.reload(); });
     $('#o-couteaux').addEventListener('click', () => choisirOnglet('couteaux'));
+    $('#o-perso').addEventListener('click', () => choisirOnglet('perso'));
     $('#o-atelier').addEventListener('click', () => choisirOnglet('atelier'));
+    $('#f-perso').addEventListener('submit', ajouterPerso);
     $('#o-textes').addEventListener('click', () => choisirOnglet('textes'));
     $('#atelier-fichiers').addEventListener('change', (e) => ajouterAtelier(Array.from(e.target.files)));
     $('#ajouter').addEventListener('click', () => ouvrirEditeur(null));
