@@ -1,6 +1,23 @@
 {
   "couteaux": [
     {
+      "id": "le-triskel-mwwh4p3b",
+      "nom": "Le Triskel",
+      "prix": null,
+      "statut": "disponible",
+      "longueur": "26.5",
+      "lame": "13.5cm",
+      "manche": "Chêne stabilisé",
+      "lienAchat": "",
+      "description": "Manche en chêne stabilisé avec incrustation d'un symbole tryskel.\nLame en acier inoxydable X50CRMOV15",
+      "photos": [
+        "images/couteaux/le-triskel-mwwh4p3b-mwwh4pap1.webp",
+        "images/couteaux/le-triskel-mwwh4p3b-mwwh4qyf2.webp",
+        "images/couteaux/le-triskel-mwwh4p3b-mwwh4sm13.webp"
+      ],
+      "date": "2026-11-25"
+    },
+    {
       "id": "le-fromager-mw9igqmv",
       "nom": "Le Fromager",
       "prix": null,
