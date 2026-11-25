@@ -366,43 +366,67 @@
     }
   }
 
-  /* ---------- Personnalisation (photo + petit titre) ---------- */
+  /* ---------- Personnalisation : des catégories, chacune avec plusieurs photos ---------- */
+
+  // Ancien format : une seule photo par élément (« photo ») ; nouveau format : « photos »
+  function normaliserPerso(x) {
+    const photos = Array.isArray(x.photos) ? x.photos.slice() : (typeof x.photo === 'string' ? [x.photo] : []);
+    return { id: x.id, titre: x.titre || '', photos };
+  }
 
   function listePerso() {
-    return Array.isArray(site.personnalisation) ? site.personnalisation : [];
+    return (Array.isArray(site.personnalisation) ? site.personnalisation : []).map(normaliserPerso);
   }
 
   function afficherPerso() {
     const ul = $('#perso-liste');
     ul.replaceChildren();
-    const items = listePerso();
-    if (!items.length) {
-      ul.append(el('li', { class: 'vide-liste', text: 'Aucun élément pour le moment.' }));
+    const cats = listePerso();
+    if (!cats.length) {
+      ul.append(el('li', { class: 'vide-liste', text: 'Aucune catégorie pour le moment.' }));
       return;
     }
-    items.forEach((x) => {
-      const img = el('img', { src: x.photo, alt: x.titre || '' });
-      img.addEventListener('error', () => { img.alt = 'En cours de publication…'; });
-      const titre = el('input', { type: 'text', value: x.titre || '', maxlength: '60', 'aria-label': 'Titre de la photo' });
-      titre.addEventListener('change', () => renommerPerso(x.id, titre.value.trim(), titre));
+    cats.forEach((c) => {
+      const titre = el('input', { type: 'text', value: c.titre, maxlength: '60', 'aria-label': 'Titre de la catégorie' });
+      titre.addEventListener('change', () => renommerPerso(c.id, titre.value.trim(), titre));
+
+      const grille = el('div', { class: 'perso-photos' });
+      c.photos.forEach((chemin) => {
+        const img = el('img', { src: chemin, alt: c.titre });
+        img.addEventListener('error', () => { img.alt = 'En cours de publication…'; });
+        const ret = el('button', { type: 'button', text: 'Retirer', 'aria-label': `Retirer cette photo de « ${c.titre} »` });
+        ret.addEventListener('click', () => retirerPhotoPerso(c, chemin));
+        grille.append(el('div', { class: 'perso-photo' }, img, ret));
+      });
+      if (!c.photos.length) grille.append(el('p', { class: 'aide', text: 'Aucune photo dans cette catégorie.' }));
+
+      const champ = el('input', { type: 'file', accept: 'image/*', multiple: 'multiple' });
+      champ.addEventListener('change', () => ajouterPhotosPerso(c.id, c.titre, [...champ.files], champ));
+      const ajout = el('label', { class: 'fichier perso-ajout' }, el('span', { text: 'Ajouter des photos à cette catégorie' }), champ);
+
       const rangee = el('div', { class: 'rangee' });
-      if (items.length > 1) rangee.append(el('button', { type: 'button', class: 'poignee', text: '⠿ Glisser', title: 'Glisser pour déplacer (ou flèches du clavier)' }));
-      const ret = el('button', { type: 'button', text: 'Retirer' });
-      ret.addEventListener('click', () => retirerPerso(x));
-      rangee.append(ret);
-      ul.append(el('li', { 'data-cle': x.id }, img, titre, rangee));
+      if (cats.length > 1) rangee.append(el('button', { type: 'button', class: 'poignee', text: '⠿ Glisser', title: 'Glisser pour déplacer (ou flèches du clavier)' }));
+      const retCat = el('button', { type: 'button', text: 'Retirer la catégorie' });
+      retCat.addEventListener('click', () => retirerPerso(c));
+      rangee.append(retCat);
+
+      ul.append(el('li', { 'data-cle': c.id }, el('label', { class: 'perso-titre-champ' }, el('span', { text: 'Titre' }), titre), grille, ajout, rangee));
     });
     activerTri(ul, (ordre) => reordonnerPerso(ordre));
   }
 
   async function sauverPerso(mutateur, message) {
-    site = await modifierJSON(FICHIER_SITE, {}, (d) => { d.personnalisation = mutateur(Array.isArray(d.personnalisation) ? d.personnalisation : []); return d; }, message);
+    site = await modifierJSON(FICHIER_SITE, {}, (d) => {
+      const brut = Array.isArray(d.personnalisation) ? d.personnalisation : [];
+      d.personnalisation = mutateur(brut.map(normaliserPerso));
+      return d;
+    }, message);
     afficherPerso();
   }
 
   async function renommerPerso(id, titre, champ) {
     const zone = $('#statut-global');
-    if (!titre) { dire(zone, 'Le titre ne peut pas être vide.', true); const x = listePerso().find((k) => k.id === id); if (x) champ.value = x.titre || ''; return; }
+    if (!titre) { dire(zone, 'Le titre ne peut pas être vide.', true); const x = listePerso().find((k) => k.id === id); if (x) champ.value = x.titre; return; }
     dire(zone, 'Enregistrement du titre…');
     try {
       await sauverPerso((l) => l.map((x) => (x.id === id ? Object.assign({}, x, { titre }) : x)), 'Personnalisation : titre modifié');
@@ -414,12 +438,55 @@
     return action('Réorganisation', () => sauverPerso((l) => reordonner(l, ordre, (x) => x.id), 'Personnalisation : ordre'));
   }
 
-  function retirerPerso(x) {
-    if (!window.confirm(`Retirer « ${x.titre || 'cette photo'} » de la personnalisation ?`)) return;
+  function retirerPerso(c) {
+    if (!window.confirm(`Retirer la catégorie « ${c.titre || 'sans titre'} » et ses ${c.photos.length} photo(s) ?`)) return;
     return action('Suppression', async () => {
-      await sauverPerso((l) => l.filter((k) => k.id !== x.id), 'Personnalisation : élément retiré');
-      try { await supprimerFichier(x.photo); } catch (e) { /* photo déjà absente */ }
+      await sauverPerso((l) => l.filter((k) => k.id !== c.id), 'Personnalisation : catégorie retirée');
+      for (const chemin of c.photos) { try { await supprimerFichier(chemin); } catch (e) { /* photo déjà absente */ } }
     });
+  }
+
+  function retirerPhotoPerso(c, chemin) {
+    if (!window.confirm('Retirer cette photo ?')) return;
+    return action('Suppression', async () => {
+      await sauverPerso((l) => l.map((x) => (x.id === c.id ? Object.assign({}, x, { photos: x.photos.filter((p) => p !== chemin) }) : x)), 'Personnalisation : photo retirée');
+      try { await supprimerFichier(chemin); } catch (e) { /* photo déjà absente */ }
+    });
+  }
+
+  // Envoie les photos puis les range dans la catégorie « id » (la crée si elle n'existe pas encore)
+  async function envoyerPhotosPerso(id, titre, fichiers) {
+    const zone = $('#statut-global');
+    const images = fichiers.filter((f) => f.type.startsWith('image/'));
+    if (!images.length) throw new Error('Choisissez au moins une photo (JPEG ou PNG).');
+    const ajoutes = [];
+    const rangerSuite = () => sauverPerso((l) => {
+      if (l.some((x) => x.id === id)) return l.map((x) => (x.id === id ? Object.assign({}, x, { photos: x.photos.concat(ajoutes) }) : x));
+      return l.concat({ id, titre, photos: ajoutes });
+    }, `Personnalisation : « ${titre} »`);
+    try {
+      for (let i = 0; i < images.length; i++) {
+        dire(zone, `Envoi de la photo ${i + 1} sur ${images.length}…`);
+        const { b64, ext } = await preparerImage(images[i]);
+        const chemin = `images/personnalisation/${slug(titre)}-${Date.now().toString(36)}${i}.${ext}`;
+        await ecrire(chemin, b64, 'Personnalisation : nouvelle photo');
+        ajoutes.push(chemin);
+      }
+    } catch (e) {
+      // Les photos déjà envoyées sont tout de même rangées, pour ne rien laisser en plan
+      if (ajoutes.length) { try { await rangerSuite(); } catch (e2) { /* rien */ } }
+      throw e;
+    }
+    await rangerSuite();
+  }
+
+  async function ajouterPhotosPerso(id, titre, fichiers, champ) {
+    const zone = $('#statut-global');
+    try {
+      await envoyerPhotosPerso(id, titre, fichiers);
+      dire(zone, 'Enregistré. Les photos apparaissent sur le site dans environ une minute.');
+    } catch (e) { dire(zone, e.message, true); }
+    champ.value = '';
   }
 
   async function ajouterPerso(e) {
@@ -427,18 +494,15 @@
     const f = e.target;
     const zone = $('#statut-global');
     const titre = f.elements.titre.value.trim();
-    const fichier = f.elements.photo.files[0];
+    const fichiers = [...f.elements.photos.files];
     if (!titre) { dire(zone, 'Indiquez un titre.', true); return; }
-    if (!fichier || !fichier.type.startsWith('image/')) { dire(zone, 'Choisissez une photo (JPEG ou PNG).', true); return; }
+    // Un titre déjà utilisé ajoute simplement les photos à la catégorie existante
+    const existante = listePerso().find((x) => slug(x.titre) === slug(titre));
+    const id = existante ? existante.id : `${slug(titre)}-${Date.now().toString(36)}`;
     const bouton = $('#perso-ajouter');
     bouton.disabled = true;
     try {
-      dire(zone, 'Envoi de la photo…');
-      const { b64, ext } = await preparerImage(fichier);
-      const id = `${slug(titre)}-${Date.now().toString(36)}`;
-      const chemin = `images/personnalisation/${id}.${ext}`;
-      await ecrire(chemin, b64, 'Personnalisation : nouvelle photo');
-      await sauverPerso((l) => l.concat({ id, titre, photo: chemin }), `Personnalisation : « ${titre} »`);
+      await envoyerPhotosPerso(id, existante ? existante.titre : titre, fichiers);
       f.reset();
       dire(zone, 'Enregistré. Le site se met à jour dans environ une minute.');
     } catch (err) {

@@ -100,11 +100,6 @@ body.adm { padding-top: 0; }
 .photos-liste li { position: relative; }
 .photos-liste .rang { font-size: .75rem; color: var(--gris); }
 
-/* Personnalisation */
-.perso-liste { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
-.perso-liste img { aspect-ratio: 4 / 3; }
-.perso-liste input[type="text"] { font: 400 .95rem var(--sans); color: var(--encre); background: var(--blanc); border: 1px solid var(--lame); border-radius: 2px; padding: .45em .6em; width: 100%; }
-#f-perso { margin-bottom: 8px; }
 
 /* Téléphone : la fenêtre d'édition ne doit jamais dépasser la largeur de l'écran */
 dialog { max-width: calc(100% - 24px); overflow-x: hidden; }
@@ -119,4 +114,26 @@ fieldset.photos { min-width: 0; max-width: 100%; }
   dialog .dialogue { padding: 18px 16px; }
   .deux { grid-template-columns: minmax(0, 1fr); }
   .actions .bouton { flex: 1 1 100%; text-align: center; }
+}
+
+/* Personnalisation : une carte par catégorie */
+.perso-liste { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 18px; }
+.perso-liste > li { display: grid; gap: 14px; padding: 16px; border: 1px solid var(--lame); background: var(--blanc); border-radius: 2px; min-width: 0; }
+.perso-liste > li.vide-liste { border: 0; background: none; padding: 0; color: var(--gris); }
+.perso-titre-champ { display: grid; gap: 6px; font-weight: 500; font-size: .9rem; }
+.perso-liste input[type="text"] { font: 400 1rem var(--sans); color: var(--encre); background: var(--blanc); border: 1px solid var(--lame); border-radius: 2px; padding: .5em .6em; width: 100%; min-width: 0; }
+.perso-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 110px), 1fr)); gap: 10px; }
+.perso-photo { display: grid; gap: 6px; min-width: 0; }
+.perso-photo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border: 1px solid var(--lame); background: var(--papier); }
+.perso-photo button, .perso-liste .rangee button { font: 500 .8rem var(--sans); padding: .35em .7em; border: 1px solid var(--lame); background: var(--blanc); border-radius: 2px; cursor: pointer; }
+.perso-liste .rangee { display: flex; gap: 8px; flex-wrap: wrap; }
+.perso-liste .rangee .poignee { border-style: dashed; border-color: var(--gris); background: var(--papier); }
+.perso-ajout { display: grid; gap: 6px; font-weight: 500; font-size: .9rem; min-width: 0; }
+.perso-ajout input { max-width: 100%; min-width: 0; font-weight: 400; }
+#f-perso { margin-bottom: 8px; }
+
+/* Onglets : à la ligne sur téléphone plutôt qu'en dépassement */
+@media (max-width: 640px) {
+  .onglets { flex-wrap: wrap; row-gap: 0; }
+  .onglets button { flex: 1 1 auto; padding-inline: .7em; font-size: .92rem; }
 }

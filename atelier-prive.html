@@ -73,17 +73,17 @@
 
     <div id="p-perso" role="tabpanel" aria-labelledby="o-perso" hidden>
       <h2>Personnalisation</h2>
-      <p class="aide">Chaque élément est une photo avec un petit titre (par exemple « Les rivets », « Le guillochage »). Ils s'affichent sur le site dans la partie « Personnalisation », entre la collection et l'atelier. Vous pouvez modifier un titre, déplacer un élément ou le retirer ; chaque changement est enregistré tout de suite.</p>
+      <p class="aide">Une catégorie = un titre (par exemple « Les rivets », « Le guillochage ») avec autant de photos que vous voulez. Sur le site, le titre s'affiche au-dessus de ses photos. Pour compléter une catégorie existante, ajoutez-y des photos depuis sa carte ci-dessous, ou saisissez le même titre ici. Chaque changement est enregistré tout de suite.</p>
       <form id="f-perso" class="formulaire">
-        <label>Titre
+        <label>Titre de la catégorie
           <input name="titre" required maxlength="60" placeholder="Les rivets">
         </label>
-        <label class="fichier">Photo
-          <input id="perso-fichier" name="photo" type="file" accept="image/*" required>
+        <label class="fichier">Photos (une ou plusieurs)
+          <input id="perso-fichier" name="photos" type="file" accept="image/*" multiple required>
         </label>
         <p><button type="submit" class="bouton" id="perso-ajouter">Ajouter</button></p>
       </form>
-      <ul id="perso-liste" class="photos-liste atelier-liste perso-liste"></ul>
+      <ul id="perso-liste" class="perso-liste"></ul>
     </div>
 
     <div id="p-atelier" role="tabpanel" aria-labelledby="o-atelier" hidden>

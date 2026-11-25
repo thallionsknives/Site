@@ -17,7 +17,6 @@
 
   let site = {};
   let couteaux = [];
-  let filtre = 'tous';
 
   /* ---------- Compteur de visites : GoatCounter, sans cookie ----------
      Le code du compteur est dans data/site.json (clé « compteur »). Sans code, rien n'est compté.
@@ -173,7 +172,7 @@
   function rendre() {
     const grille = $('#grille');
     grille.replaceChildren();
-    const liste = couteaux.filter((c) => filtre === 'tous' || statutDe(c) === filtre);
+    const liste = couteaux;
     liste.forEach((c, i) => {
       const b = carte(c);
       b.classList.add('reveal');
@@ -287,24 +286,32 @@
     });
   }
 
-  /* Personnalisation : liste « personnalisation » de data/site.json, chaque élément = un titre + une photo */
+  /* Personnalisation : chaque catégorie a un titre au-dessus de ses photos (« photos »).
+     L'ancien format, une seule « photo » par élément, reste lu. */
   function afficherPerso() {
     const zone = $('#perso-grille');
-    const items = (Array.isArray(site.personnalisation) ? site.personnalisation : [])
-      .filter((x) => x && typeof x.photo === 'string' && CHEMIN_OK.test(x.photo));
+    const cats = (Array.isArray(site.personnalisation) ? site.personnalisation : [])
+      .map((x) => {
+        const brut = Array.isArray(x && x.photos) ? x.photos : (x && typeof x.photo === 'string' ? [x.photo] : []);
+        return { titre: x && typeof x.titre === 'string' ? x.titre.trim() : '', photos: brut.filter((p) => typeof p === 'string' && CHEMIN_OK.test(p)) };
+      })
+      .filter((c) => c.photos.length);
     zone.replaceChildren();
-    zone.hidden = items.length === 0;
-    const photos = items.map((x) => x.photo);
-    const nom = (x, i) => (typeof x.titre === 'string' && x.titre.trim()) || `Personnalisation ${i + 1}`;
-    items.forEach((x, i) => {
-      const t = nom(x, i);
-      const b = el('button', { type: 'button', class: 'perso-item reveal', 'aria-label': `Agrandir la photo : ${t}` },
-        el('img', { src: x.photo, alt: t, loading: 'lazy', decoding: 'async' }),
-        el('span', { class: 'perso-titre', text: t }));
-      b.style.setProperty('--d', `${(i % 3) * 110}ms`);
-      b.addEventListener('click', () => ouvrirZoom(i, b, photos, (k) => nom(items[k], k)));
-      zone.append(b);
-      surveiller(b);
+    zone.hidden = cats.length === 0;
+    cats.forEach((c, n) => {
+      const t = c.titre || `Personnalisation ${n + 1}`;
+      const titre = el('h3', { class: 'perso-cat-titre', text: t });
+      const rangee = el('div', { class: 'perso-photos' });
+      c.photos.forEach((chemin, i) => {
+        const etiquette = c.photos.length > 1 ? `${t} (${i + 1}/${c.photos.length})` : t;
+        const b = el('button', { type: 'button', class: 'perso-item', 'aria-label': `Agrandir la photo : ${etiquette}` },
+          el('img', { src: chemin, alt: etiquette, loading: 'lazy', decoding: 'async' }));
+        b.addEventListener('click', () => ouvrirZoom(i, b, c.photos, (k) => (c.photos.length > 1 ? `${t} (${k + 1}/${c.photos.length})` : t)));
+        rangee.append(b);
+      });
+      const bloc = el('div', { class: 'perso-cat reveal' }, titre, rangee);
+      zone.append(bloc);
+      surveiller(bloc);
     });
   }
 
@@ -385,14 +392,6 @@
     $('#annee').textContent = new Date().getFullYear();
     effetsEntete();
     document.querySelectorAll('.reveal').forEach(surveiller);
-
-    document.querySelectorAll('.filtre').forEach((b) => {
-      b.addEventListener('click', () => {
-        filtre = b.dataset.filtre;
-        document.querySelectorAll('.filtre').forEach((x) => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
-        rendre();
-      });
-    });
 
     // Fenêtre des mentions légales
     const mentions = $('#mentions');
