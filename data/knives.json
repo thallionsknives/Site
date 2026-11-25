@@ -52,13 +52,13 @@
     {
       "id": "sommelier-mv19vjdn",
       "nom": "Le Sommelier",
-      "prix": 150,
-      "statut": "reserve",
+      "prix": null,
+      "statut": "disponible",
       "longueur": "12.5 cm",
       "lame": "Acier inoxydable",
       "manche": "pêcher",
       "lienAchat": "",
-      "description": "",
+      "description": "Sommelier en pêcher \nAcier inoxydable X50CrMoV15",
       "photos": [
         "images/couteaux/sommelier-mv19vjdn-mv19vjeb0.webp"
       ],
