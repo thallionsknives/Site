@@ -3,8 +3,8 @@
     {
       "id": "le-fromager-mw9igqmv",
       "nom": "Le Fromager",
-      "prix": 70,
-      "statut": "reserve",
+      "prix": null,
+      "statut": "disponible",
       "longueur": "22",
       "lame": "Acier inoxydable, 12 cm",
       "manche": "chêne échauffé stabilisé",
