@@ -75,5 +75,12 @@
     "images/atelier/atelier-mv10ykst0.webp",
     "images/atelier/atelier-mv108qhx1.webp",
     "images/atelier/atelier-mv108p8w0.webp"
+  ],
+  "personnalisation": [
+    {
+      "id": "le-guillochage-mwwhyubr",
+      "titre": "Le guillochage",
+      "photo": "images/personnalisation/le-guillochage-mwwhyubr.webp"
+    }
   ]
 }
