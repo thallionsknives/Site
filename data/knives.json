@@ -114,8 +114,8 @@
     {
       "id": "exemple-office",
       "nom": "Agnès",
-      "prix": 100,
-      "statut": "reserve",
+      "prix": null,
+      "statut": "disponible",
       "longueur": "16 cm",
       "lame": "Acier Carbone, 6 cm",
       "manche": "Frêne",
