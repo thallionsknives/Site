@@ -80,7 +80,10 @@
     {
       "id": "le-guillochage-mwwhyubr",
       "titre": "Le guillochage",
-      "photo": "images/personnalisation/le-guillochage-mwwhyubr.webp"
+      "photos": [
+        "images/personnalisation/le-guillochage-mwwhyubr.webp",
+        "images/personnalisation/le-guillochage-mwx97v7t0.webp"
+      ]
     }
   ]
 }
