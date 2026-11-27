@@ -293,7 +293,7 @@
     const cats = (Array.isArray(site.personnalisation) ? site.personnalisation : [])
       .map((x) => {
         const brut = Array.isArray(x && x.photos) ? x.photos : (x && typeof x.photo === 'string' ? [x.photo] : []);
-        return { titre: x && typeof x.titre === 'string' ? x.titre.trim() : '', photos: brut.filter((p) => typeof p === 'string' && CHEMIN_OK.test(p)) };
+        return { zoom: !(x && x.zoom === false), titre: x && typeof x.titre === 'string' ? x.titre.trim() : '', photos: brut.filter((p) => typeof p === 'string' && CHEMIN_OK.test(p)) };
       })
       .filter((c) => c.photos.length);
     zone.replaceChildren();
@@ -304,9 +304,15 @@
       const rangee = el('div', { class: 'perso-photos' });
       c.photos.forEach((chemin, i) => {
         const etiquette = c.photos.length > 1 ? `${t} (${i + 1}/${c.photos.length})` : t;
-        const b = el('button', { type: 'button', class: 'perso-item', 'aria-label': `Agrandir la photo : ${etiquette}` },
-          el('img', { src: chemin, alt: etiquette, decoding: 'async' }));
-        b.addEventListener('click', () => ouvrirZoom(i, b, c.photos, (k) => (c.photos.length > 1 ? `${t} (${k + 1}/${c.photos.length})` : t)));
+        const image = el('img', { src: chemin, alt: etiquette, decoding: 'async' });
+        let b;
+        if (c.zoom) {
+          b = el('button', { type: 'button', class: 'perso-item', 'aria-label': `Agrandir la photo : ${etiquette}` }, image);
+          b.addEventListener('click', () => ouvrirZoom(i, b, c.photos, (k) => (c.photos.length > 1 ? `${t} (${k + 1}/${c.photos.length})` : t)));
+        } else {
+          // Catégorie sans zoom (« zoom: false » dans data/site.json) : simple image, non cliquable
+          b = el('div', { class: 'perso-item perso-item-fixe' }, image);
+        }
         rangee.append(b);
       });
       const bloc = el('div', { class: 'perso-cat reveal' }, titre, rangee);

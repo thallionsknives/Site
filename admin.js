@@ -371,7 +371,9 @@
   // Ancien format : une seule photo par élément (« photo ») ; nouveau format : « photos »
   function normaliserPerso(x) {
     const photos = Array.isArray(x.photos) ? x.photos.slice() : (typeof x.photo === 'string' ? [x.photo] : []);
-    return { id: x.id, titre: x.titre || '', photos };
+    const c = { id: x.id, titre: x.titre || '', photos };
+    if (x.zoom === false) c.zoom = false; // option conservée à chaque enregistrement
+    return c;
   }
 
   function listePerso() {
