@@ -305,7 +305,7 @@
       c.photos.forEach((chemin, i) => {
         const etiquette = c.photos.length > 1 ? `${t} (${i + 1}/${c.photos.length})` : t;
         const b = el('button', { type: 'button', class: 'perso-item', 'aria-label': `Agrandir la photo : ${etiquette}` },
-          el('img', { src: chemin, alt: etiquette, loading: 'lazy', decoding: 'async' }));
+          el('img', { src: chemin, alt: etiquette, decoding: 'async' }));
         b.addEventListener('click', () => ouvrirZoom(i, b, c.photos, (k) => (c.photos.length > 1 ? `${t} (${k + 1}/${c.photos.length})` : t)));
         rangee.append(b);
       });

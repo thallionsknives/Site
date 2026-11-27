@@ -238,9 +238,10 @@ dialog::backdrop { background: rgba(21, 26, 29, .6); }
 /* Personnalisation : une photo et un petit titre, cliquable pour agrandir */
 .perso-categories { display: grid; gap: clamp(36px, 5vw, 60px); margin-top: clamp(28px, 4vw, 48px); }
 .perso-cat-titre { margin: 0 0 16px; font-family: var(--serif); font-weight: 400; font-size: clamp(1.45rem, 2.4vw, 1.8rem); line-height: 1.2; letter-spacing: -.01em; }
-.perso-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: clamp(14px, 2vw, 22px); }
-.perso-item { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
-.perso-item img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border: 1px solid var(--lame); border-radius: 2px; transition: opacity .3s ease; }
+.perso-photos { column-width: 160px; column-gap: clamp(12px, 2vw, 20px); }
+.perso-item { display: block; width: 100%; margin: 0 0 clamp(12px, 2vw, 20px); padding: 0; border: 0; background: none; cursor: zoom-in; break-inside: avoid; }
+/* Chaque photo garde son propre format : ni recadrage, ni déformation */
+.perso-item img { display: block; width: 100%; height: auto; border: 1px solid var(--lame); border-radius: 2px; transition: opacity .3s ease; }
 .perso-item:hover img { opacity: .88; }
 
 /* Visionneuse : une photo en grand, flèches pour passer à la suivante */
